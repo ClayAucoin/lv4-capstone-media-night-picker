@@ -9,4 +9,5 @@ export const config = {
   nodeEnv: process.env.NODE_ENV || "development",
   weather_key: process.env.WEATHER_KEY || "",
   weather_service_key: process.env.WEATHER_SERVICE_KEY || "",
+  hf_token: process.env.HF_TOKEN || "",
 }

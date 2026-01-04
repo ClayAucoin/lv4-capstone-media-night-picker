@@ -10,6 +10,7 @@ import { config } from "./config.js"
 // routes
 import rootRouter from "./routes/root.js"
 import itemsRouter from "./routes/items.js"
+import weatherRouter from "./routes/read-weather.js"
 
 const app = express()
 
@@ -18,7 +19,8 @@ app.use(express.json())
 
 // use routes
 app.use("/", rootRouter)
-app.use("/api/v1/weather", itemsRouter)
+app.use("/api/v1/weather", weatherRouter)
+app.use("/api/v1/ai", itemsRouter)
 
 
 // check for malformed JSON
