@@ -25,7 +25,7 @@ router.get('/', async (req, res, next) => {
   const count = 5
   const moods = ["intense", "action"]
   const len_bucket = "GT_150"
-  const wx_bucket = "SUNNY"
+  const wx_bucket = "CLEAR"
   const prompt_version = "v1"
 
   const prompt = `You are a movie recommendation engine.
@@ -54,6 +54,11 @@ Weather vibe guide (use ONLY the enum values above):
 - HOT: light, fun, breezy
 - STORM: tense, focused, high-energy (still respect the mood list)
 
+Integration note:
+- The system will try to resolve posters/slugs using Trakt.tv (VIP available).
+- Therefore, if you know the Trakt slug for a movie, include it.
+- If you do not know with high confidence, leave those fields blank as specified in the schema.
+
 Input (user request):
 - requested_moods: ${JSON.stringify(moods)}   (must be from allowed moods; lowercase)
 - length_requirement: ${len_bucket}  (use this exact enum in output)
@@ -63,22 +68,36 @@ Input (user request):
 Rules:
 - Return exactly ${count} recommendations.
 - Prefer widely-known real movies. If unsure, pick mainstream titles. Do not invent runtimes or plot facts.
+- If you are unsure a movie is real, do not include it.
+- If a movie is commonly confused with remakes or same-title movies, prefer the most well-known version and ensure "year" matches that version.
+- Add IDs only if confident:
+  - trakt_slug may be provided if you are confident in the exact Trakt slug, otherwise null.
+  - tmdb_id may be provided if you are confident it is correct, otherwise 0.
+  - imdb_id may be provided if you are confident it is correct, otherwise "".
+  - Prefer providing trakt_slug over tmdb_id/imdb_id. If unsure about tmdb/imdb, leave them blank; Trakt resolution will handle it.
+- Never guess IDs. If unsure, leave them blank as specified above.
+- imdb_id must be "" or match ^tt\\d{7,8}$.
+- Always include "year" to help downstream ID resolution.
 - Every recommendation MUST set:
   - "length_bucket" exactly as "${len_bucket}"
   - "weather_bucket" exactly as "${wx_bucket}"
 - The "moods" array must contain 1 or 2 values ONLY from requested_moods (no other moods).
 - "reason" must be 1-2 practical sentences connecting mood + weather vibe + runtime.
 - Do NOT output any enum value outside the allowed lists. If you cannot comply, return:
-  {"prompt_version":"v1","recommendations":[]}
+{"prompt_version":"v2","recommendations":[]}
 
 Self-check before output:
 - length_bucket is exactly "${len_bucket}" for every item
 - weather_bucket is exactly "${wx_bucket}" for every item
 - moods are only from requested_moods
+- trakt_type is "movie" for every item
+- trakt_slug is either a string you are confident in or null
+- tmdb_id is either a known correct integer or 0
+- imdb_id is "" or matches ^tt\\d{7,8}$
 
 Output JSON schema EXACTLY:
 {
-  "prompt_version": "v1",
+  "prompt_version": "v2",
   "recommendations": [
     {
       "title": "string",
@@ -86,35 +105,14 @@ Output JSON schema EXACTLY:
       "length_bucket": "LT_90",
       "moods": ["chill"],
       "weather_bucket": "RAIN",
-      "reason": "string"
+      "reason": "string",
+      "trakt_type": "movie",
+      "trakt_slug": null,
+      "tmdb_id": 0,
+      "imdb_id": ""
     }
   ]
-}
-`.trim();
-
-
-  // Rules:
-  // - Return exactly ${count} recommendations.
-  // - Each recommendation must be an actual movie. Do not use fictional information.
-  // - Each recommendation must be ${LENGTH_BUCKET_LABELS[len_bucket]}.
-  // - Each recommendation must fit the ${moods} vibe for a ${wx_bucket} day.
-  // - Keep reasons short (1-2 sentences), practical, not cheesy.
-  // - No markdown. No extra keys.
-
-  // Return STRICT JSON only with this example shape:
-  // {
-  //   "prompt_version": "v1",
-  //   "recommendations": [
-  //     {
-  //       "title": "string",
-  //       "year": 2000,
-  //       "length_bucket": "LT_90",
-  //       "moods": ["chill", "funny"],
-  //       "weather_bucket": "RAIN",
-  //       "reason": "string"
-  //     }
-  //   ]
-  // }`.trim()
+}`.trim();
 
   const client = new OpenAI({
     baseURL: "https://router.huggingface.co/v1",
@@ -135,7 +133,7 @@ Output JSON schema EXACTLY:
 
   try {
     res.json({
-      raw: data,
+      // raw: data,
       data: parseModelJson(data.content)
     })
   } catch (err) {

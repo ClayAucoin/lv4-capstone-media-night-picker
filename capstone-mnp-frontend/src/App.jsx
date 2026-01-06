@@ -1,3 +1,5 @@
+// src/App.jsx
+
 import { useState, useEffect } from "react"
 import supabase from "./utils/supabase.js"
 
@@ -19,11 +21,19 @@ function Page() {
   }, [])
 
   return (
-    <div>
-      {sets.map((set) => (
-        <li key={set.id}>{set.title}</li>
-      ))}
-    </div>
+    <>
+      <div className="card" style={{ width: "18rem" }}>
+        {/* <img src="..." class="card-img-top" alt="..." /> */}
+        <div className="card-body">
+          <h5 className="card-title">Card title</h5>
+          <div>
+            {sets.map((set) => (
+              <li key={set.id}>{set.title}</li>
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
   )
 }
 export default Page

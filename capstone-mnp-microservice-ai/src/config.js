@@ -7,7 +7,8 @@ dotenv.config()
 export const config = {
   port: process.env.PORT || 3002,
   nodeEnv: process.env.NODE_ENV || "development",
-  weather_key: process.env.WEATHER_KEY || "",
-  weather_service_key: process.env.WEATHER_SERVICE_KEY || "",
+  trakt_client_id: process.env.TRAKT_CLIENT_ID || "",
+  tmdb_api_key: process.env.TMDB_API_KEY || "",
+  app_service_key: process.env.APP_SERVICE_KEY || "",
   hf_token: process.env.HF_TOKEN || "",
 }

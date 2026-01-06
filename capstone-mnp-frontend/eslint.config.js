@@ -1,3 +1,5 @@
+// eslint.config.js
+
 import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
@@ -24,6 +26,14 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+    },
+  },
+  {
+    files: ["tests/**/*.test.js", "tests/**/*.spec.js", "**/*.parity.test.js"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
     },
   },
 ])
