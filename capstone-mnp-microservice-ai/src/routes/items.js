@@ -4,7 +4,6 @@ import express from "express";
 
 // routes
 import readRouter from "./read.js"
-// import readRouter from "./read-weather.js"
 
 const itemsRouter = express.Router()
 
