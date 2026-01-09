@@ -1,6 +1,15 @@
 // src/Components/FormFields.jsx
 
-import { useState } from "react"
+const IS_TESTING = true
+
+let SET_TABLE
+if (IS_TESTING) {
+  SET_TABLE = "lv4_cap_recommendation_sets_temp"
+} else {
+  SET_TABLE = "lv4_cap_recommendation_sets"
+}
+
+import { useState, useEffect, useCallback } from "react"
 import supabase from "../utils/supabase.js"
 
 const MOODS = [
@@ -30,10 +39,36 @@ function todayLocalYYYYMMDD() {
 }
 
 export default function FormFields() {
-  const [querySignature, setQuerySignature] = useState(false)
+  const [sets, setSets] = useState([])
+
+  // get sets from table
+  const getSets = useCallback(async () => {
+    const { data, error } = await supabase.from(SET_TABLE).select()
+
+    if (error) {
+      console.error("getSets error:", error.message)
+      return []
+    }
+
+    return data ?? []
+  }, [])
+
+  useEffect(() => {
+    let isMounted = true
+
+    getSets().then((rows) => {
+      if (isMounted) {
+        setSets(rows)
+      }
+    })
+
+    return () => {
+      isMounted = false
+    }
+  }, [getSets])
 
   // zip
-  const [zip, setZip] = useState("")
+  const [zip, setZip] = useState(IS_TESTING ? "70003" : "")
   const zipOk = /^\d{5}$/.test(zip)
 
   // date
@@ -54,9 +89,7 @@ export default function FormFields() {
   // length
   const [length, setLength] = useState("")
 
-  async function handleSubmit(e) {
-    e.preventDefault()
-
+  async function handleSubmit() {
     // get values from form
     const newSet = {
       moods: selectedMoods,
@@ -66,18 +99,27 @@ export default function FormFields() {
       variant: "default",
     }
 
-    setQuerySignature(false)
-    checkQuerySignature()
-
-    if (!querySignature) {
-      const { error } = await supabase
-        .from("lv4_cap_recommendation_sets_temp")
-        .insert(newSet)
-
-      if (error) console.error("insert error:", error.message)
-      console.log("newSet:", newSet)
+    const exists = await checkQuerySignature()
+    console.log("exists:", exists)
+    if (exists) {
+      console.log(
+        "Set with this signature already exists. Return items within set"
+      )
+      return
     }
-    setQuerySignature(false)
+
+    const { error } = await supabase
+      .from(SET_TABLE)
+      .insert(newSet)
+      .select()
+      .single()
+
+    if (error) {
+      console.error("insert error:", error.message)
+      return
+    }
+
+    setSets(await getSets())
   }
 
   // query_signature
@@ -96,7 +138,7 @@ export default function FormFields() {
     moods = [],
     length,
     weather,
-    pv = "v1",
+    pv = "v0",
     variant = "default",
   }) {
     const parts = []
@@ -119,7 +161,7 @@ export default function FormFields() {
     return parts.join("|")
   }
 
-  const query_Signature = buildQuerySignature({
+  const query_signature = buildQuerySignature({
     moods: selectedMoods,
     length: length,
     weather: "CLEAR",
@@ -127,145 +169,185 @@ export default function FormFields() {
 
   async function checkQuerySignature() {
     const { data, error } = await supabase
-      .from("lv4_cap_recommendation_sets_temp")
-      .select()
-      .eq("query_signature", query_Signature)
+      .from(SET_TABLE)
+      .select("query_signature")
+      .eq("query_signature", query_signature)
+      .limit(1)
 
-    if (error) console.error("checkQuerySignature error:", error.message)
+    if (error) {
+      console.error("checkQuerySignature error:", error.message)
+      return false
+    }
 
-    console.log("signatureExists:", data)
-    if (data) return setQuerySignature(true)
+    if (data) {
+      console.log("query_signature:", query_signature)
+      console.log("signatureExists:", data)
+    }
+    console.log("(data?.length ?? 0) > 0:", (data?.length ?? 0) > 0)
+    return (data?.length ?? 0) > 0
   }
 
   return (
-    <div className="container py-3" style={{ maxWidth: 720 }}>
-      {/* zip */}
-      <div className="mb-3">
-        <label htmlFor="zip" className="form-label">
-          ZIP code
-        </label>
+    <>
+      <div className="container py-3" style={{ maxWidth: 1000 }}>
+        <div className="row">
+          <div className="col-6">
+            {/* zip */}
+            <div className="mb-3">
+              <label htmlFor="zip" className="form-label">
+                ZIP code
+              </label>
 
-        <input
-          id="zip"
-          name="zip"
-          type="text"
-          inputMode="numeric"
-          className={`form-control form-control-sm ${
-            zip.length ? (zipOk ? "is-valid" : "is-invalid") : ""
-          }`}
-          placeholder="ZIP code (e.g., 70112)"
-          value={zip}
-          onChange={(e) => {
-            const digitsOnly = e.target.value.replace(/\D/g, "").slice(0, 5)
-            setZip(digitsOnly)
-          }}
-        />
+              <input
+                id="zip"
+                name="zip"
+                type="text"
+                inputMode="numeric"
+                className={`form-control form-control-sm ${
+                  zip.length ? (zipOk ? "is-valid" : "is-invalid") : ""
+                }`}
+                placeholder="ZIP code (e.g., 70112)"
+                value={zip}
+                onChange={(e) => {
+                  const digitsOnly = e.target.value
+                    .replace(/\D/g, "")
+                    .slice(0, 5)
+                  setZip(digitsOnly)
+                }}
+              />
 
-        <div className="form-text">We use this to look up the weather.</div>
+              <div className="form-text">
+                We use this to look up the weather.
+              </div>
 
-        {!zipOk && zip.length > 0 && (
-          <div className="invalid-feedback d-block">
-            Enter a 5-digit ZIP code.
+              {!zipOk && zip.length > 0 && (
+                <div className="invalid-feedback d-block">
+                  Enter a 5-digit ZIP code.
+                </div>
+              )}
+            </div>
+
+            {/* date */}
+            <div className="mb-3">
+              <label htmlFor="watchDate" className="form-label">
+                What day are you watching? ({date})
+              </label>
+
+              <input
+                id="watchDate"
+                name="watchDate"
+                type="date"
+                className="form-control form-control-sm cursor-pointer"
+                style={{ cursor: zipOk ? "pointer" : "not-allowed" }}
+                value={date}
+                min={today}
+                disabled={dateDisabled}
+                onChange={(e) => setDate(e.target.value)}
+              />
+
+              <div className="form-text">
+                {dateDisabled
+                  ? "Enter your ZIP code to enable date selection."
+                  : "Used to match the weather for that day."}
+              </div>
+            </div>
+
+            {/* moods */}
+            <div className="mb-3">
+              <div className="form-label mb-2">
+                What kind of vibe are you in the mood for?
+              </div>
+
+              <div className="d-flex justify-content-center">
+                <div className="d-flex justify-content-around flex-wrap gap-2 w-75">
+                  {MOODS.map((m) => {
+                    const active = selectedMoods.includes(m.value)
+                    return (
+                      <button
+                        key={m.value}
+                        type="button"
+                        className={`btn btn-sm rounded-pill btn-pill-sm ${
+                          active ? "btn-primary" : "btn-outline-primary"
+                        }`}
+                        onClick={() => toggleMood(m.value)}
+                        aria-pressed={active}
+                      >
+                        {m.label}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+              <div className="form-text">Pick one or more moods.</div>
+            </div>
+
+            {/* length */}
+            <div className="mb-3">
+              <label htmlFor="length" className="form-label">
+                How long do you want the movie to be?
+              </label>
+
+              <select
+                id="length"
+                className="form-select form-select-sm"
+                value={length}
+                onChange={(e) => setLength(e.target.value)}
+              >
+                <option value="">Any length</option>
+
+                {LENGTH.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+
+              <div className="form-text">
+                Pick a time range that fits your schedule.
+              </div>
+            </div>
+
+            <div className="text-center mb-2">
+              <button
+                className="btn btn-primary btn-sm"
+                type="button"
+                onClick={handleSubmit}
+              >
+                Get Movies
+              </button>
+            </div>
+
+            {/* json output */}
+            <pre className="bg-light p-2 rounded small">
+              <small>
+                {JSON.stringify(
+                  { zip, date, length, moods: selectedMoods },
+                  null,
+                  2
+                )}
+              </small>
+            </pre>
           </div>
-        )}
-      </div>
-
-      {/* date */}
-      <div className="mb-3">
-        <label htmlFor="watchDate" className="form-label">
-          What day are you watching? ({date})
-        </label>
-
-        <input
-          id="watchDate"
-          name="watchDate"
-          type="date"
-          className="form-control form-control-sm cursor-pointer"
-          style={{ cursor: zipOk ? "pointer" : "not-allowed" }}
-          value={date}
-          min={today}
-          disabled={dateDisabled}
-          onChange={(e) => setDate(e.target.value)}
-        />
-
-        <div className="form-text">
-          {dateDisabled
-            ? "Enter your ZIP code to enable date selection."
-            : "Used to match the weather for that day."}
-        </div>
-      </div>
-
-      {/* moods */}
-      <div className="mb-3">
-        <div className="form-label mb-2">
-          What kind of vibe are you in the mood for?
-        </div>
-
-        <div className="d-flex justify-content-center">
-          <div className="d-flex justify-content-around flex-wrap gap-2 w-75">
-            {MOODS.map((m) => {
-              const active = selectedMoods.includes(m.value)
-              return (
-                <button
-                  key={m.value}
-                  type="button"
-                  className={`btn btn-sm rounded-pill btn-pill-sm ${
-                    active ? "btn-primary" : "btn-outline-primary"
-                  }`}
-                  onClick={() => toggleMood(m.value)}
-                  aria-pressed={active}
-                >
-                  {m.label}
-                </button>
-              )
-            })}
+          <div className="col-6">
+            <div>
+              <ul>
+                <small>
+                  {sets.length === 0 ? (
+                    <p>No sets yet.</p>
+                  ) : (
+                    sets.map((set) => (
+                      <li key={set.id}>
+                        {normalizeMoods(set.moods)}, {set.length_bucket},{" "}
+                        {set.weather_bucket}
+                      </li>
+                    ))
+                  )}
+                </small>
+              </ul>
+            </div>
           </div>
         </div>
-        <div className="form-text">Pick one or more moods.</div>
       </div>
-
-      {/* length */}
-      <div className="mb-3">
-        <label htmlFor="length" className="form-label">
-          How long do you want the movie to be?
-        </label>
-
-        <select
-          id="length"
-          className="form-select form-select-sm"
-          value={length}
-          onChange={(e) => setLength(e.target.value)}
-        >
-          <option value="">Any length</option>
-
-          {LENGTH.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-
-        <div className="form-text">
-          Pick a time range that fits your schedule.
-        </div>
-      </div>
-
-      <div className="text-center mb-2">
-        <button
-          className="btn btn-primary btn-sm"
-          type="button"
-          onClick={handleSubmit}
-        >
-          Get Movies
-        </button>
-      </div>
-
-      {/* json output */}
-      <pre className="bg-light p-2 rounded small">
-        <small>
-          {JSON.stringify({ zip, date, length, moods: selectedMoods }, null, 2)}
-        </small>
-      </pre>
-    </div>
+    </>
   )
 }
