@@ -1,5 +1,13 @@
 ### INSERT new set
 
+<!--
+
+- length_bucket: ["LT_90","B90_120","B120_150","GT_150"]
+- weather_bucket: ["CLEAR","RAIN","COLD","HOT","STORM"]
+- moods: ["chill","funny","intense","romantic","family","uplifting","mystery","action"]
+
+-->
+
 ```js
 const payload = {
   moods,
