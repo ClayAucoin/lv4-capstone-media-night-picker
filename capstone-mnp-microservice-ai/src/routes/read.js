@@ -3,15 +3,18 @@
 import express from "express"
 import { validateAPIKey, validateWeatherQuery } from "../middleware/validators.js"
 import { config } from "../config.js"
+import { dummyDataSets } from "../data/data-sets.js"
 import { sendError } from "../utils/sendError.js"
 import { OpenAI } from "openai"
 
 const router = express.Router()
 
-// ---- GET /api/v1/ai route ----
+// 'CLEAR','RAIN','COLD','HOT','STORM'
+
+// ---- GET /api/v1/ai?t=true route ----
 router.get('/', async (req, res, next) => {
   console.log('GET /api/v1/ai')
-  // const { zip, dateString } = req.weatherParams
+  const is_testing = parseBoolean(req.query.t)
 
   const LENGTH_BUCKET_LABELS = {
     LT_90: "Less than 90 minutes",
@@ -23,10 +26,18 @@ router.get('/', async (req, res, next) => {
   const apiKey = config.weather_key
 
   const count = 5
-  const moods = ["intense", "action"]
-  const len_bucket = "GT_150"
-  const wx_bucket = "CLEAR"
-  const prompt_version = "v1"
+  const moods = ["uplifting", "mystery"]
+  const len_bucket = "B90_120"
+  const wx_bucket = "HOT"
+  const prompt_version = "v2"
+
+  const inputParameters = {
+    count,
+    len_bucket,
+    wx_bucket,
+    prompt_version,
+    moods
+  }
 
   const prompt = `You are a movie recommendation engine.
 
@@ -97,7 +108,7 @@ Self-check before output:
 
 Output JSON schema EXACTLY:
 {
-  "prompt_version": "v2",
+  "prompt_version": ${prompt_version},
   "recommendations": [
     {
       "title": "string",
@@ -114,28 +125,37 @@ Output JSON schema EXACTLY:
   ]
 }`.trim();
 
-  const client = new OpenAI({
-    baseURL: "https://router.huggingface.co/v1",
-    apiKey: process.env.HF_TOKEN,
-  });
+  let data
+  if (!is_testing) {
+    const client = new OpenAI({
+      baseURL: "https://router.huggingface.co/v1",
+      apiKey: process.env.HF_TOKEN,
+    });
 
-  const chatCompletion = await client.chat.completions.create({
-    model: "openai/gpt-oss-20b:groq",
-    messages: [
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
-  });
+    const chatCompletion = await client.chat.completions.create({
+      model: "openai/gpt-oss-20b:groq",
+      messages: [
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+    });
 
-  const data = chatCompletion.choices[0].message
+    data = chatCompletion.choices[0].message
+  }
+
+  const picked = is_testing
+    ? dummyDataSets[randomInt(0, dummyDataSets.length - 1)]
+    : parseModelJson(data.content)
+
+  const dataOut =
+    picked?.data?.[0]?.data ??
+    picked?.data ??
+    picked
 
   try {
-    res.json({
-      // raw: data,
-      data: parseModelJson(data.content)
-    })
+    res.json({ data: dataOut })
   } catch (err) {
     console.error(err)
     return next(sendError(500, "Internal server error", "INTERNAL_ERROR", {
@@ -165,4 +185,15 @@ function parseModelJson(contentString) {
 
   const jsonSlice = s.slice(firstBrace, lastBrace + 1);
   return JSON.parse(jsonSlice);
+}
+
+function parseBoolean(value = "true") {
+  const v = value.toLowerCase()
+  if (v === "true") return true
+  if (v === "false") return false
+  return value
+}
+
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min
 }
