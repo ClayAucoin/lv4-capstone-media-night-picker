@@ -1,21 +1,18 @@
-// src/routes/movies.js
+// src/routes/items.js
 
-import express from "express"
-import { sendError } from "../utils/sendError.js"
-import data from "../data.js"
+import express from "express";
 
-const router = express.Router()
+// routes
+import readRouter from "./read.js"
+import findRouter from "./find.js"
+import addRouter from "./add.js"
+import delRouter from "./del.js"
 
-router.get("/", (req, res, next) => {
-  try {
-    console.log("GET /movies")
-    res.status(200).json({
-      ok: true,
-      data: data
-    })
-  } catch (err) {
-    next(sendError(500, "Failed to read data", "READ_ERROR"))
-  }
-})
+const itemsRouter = express.Router()
 
-export default router
+itemsRouter.use("/", readRouter)      // GET /items/
+itemsRouter.use("/", findRouter)      // GET /items/:id
+itemsRouter.use("/", addRouter)       // POST /items/
+itemsRouter.use("/", delRouter)       // DELETE /items/:id
+
+export default itemsRouter

@@ -26,14 +26,14 @@ export function validateMovieBody(req, res, next) {
   const { id, imdb_id, title, year } = req.body
 
   const missing = []
-  if (id === undefined) missing.push("id")
+  // if (id === undefined) missing.push("id")
   if (!title) missing.push("title")
   if (!year) missing.push("year")
 
   if (missing.length > 0) { return next(sendError(422, "Missing required fields", "VALIDATION_ERROR", { missing })) }
 
-  // id must be number
-  if (typeof id !== "number") { return next(sendError(422, `'id' must be a number`, "INVALID_TYPE", { field: "id", value: id })) }
+  // id must be number, deactivated, using incremental for add
+  // if (typeof id !== "number") { return next(sendError(422, `'id' must be a number`, "INVALID_TYPE", { field: "id", value: id })) }
 
   // year must be number
   if (typeof year !== "number") { return next(sendError(422, `'year' must be a number`, "INVALID_TYPE", { field: "year", value: year })) }

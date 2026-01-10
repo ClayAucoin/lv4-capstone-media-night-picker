@@ -1,0 +1,306 @@
+[
+  {
+    "id": 1,
+    "imdb_id": "tt4172430",
+    "title": "13 Hours: The Secret Soldiers of Benghazi",
+    "year": 2016,
+    "runtime": "2:24:29",
+    "rating": "R",
+    "poster": "https://image.tmdb.org/t/p/original/AskDcQ6Sa6jImyt2KDQbgRuPebH.jpg",
+    "genres": [
+      "War",
+      "Action",
+      "History",
+      "Drama",
+      "Thriller"
+    ]
+  },
+  {
+    "id": 2,
+    "imdb_id": "tt0377471",
+    "title": "Be Cool",
+    "year": 2005,
+    "runtime": "1:59:36",
+    "rating": "PG-13",
+    "poster": "https://image.tmdb.org/t/p/original/ekKCH7Zkb5ZTr1f1AczZY23FH.jpg",
+    "genres": [
+      "Comedy",
+      "Crime"
+    ]
+  },
+  {
+    "id": 3,
+    "imdb_id": "tt0094721",
+    "title": "Beetlejuice",
+    "year": 1988,
+    "runtime": "1:32:06",
+    "rating": "PG",
+    "poster": "https://image.tmdb.org/t/p/original/nnl6OWkyPpuMm595hmAxNW3rZFn.jpg",
+    "genres": [
+      "Fantasy",
+      "Comedy"
+    ]
+  },
+  {
+    "id": 4,
+    "imdb_id": "tt2911666",
+    "title": "John Wick",
+    "year": 2014,
+    "runtime": "1:41:12",
+    "rating": "R",
+    "poster": "https://image.tmdb.org/t/p/original/fZPSd91yGE9fCcCe6OoQr6E3Bev.jpg",
+    "genres": [
+      "Action",
+      "Thriller"
+    ]
+  },
+  {
+    "id": 5,
+    "imdb_id": "tt4425200",
+    "title": "John Wick: Chapter 2",
+    "year": 2017,
+    "runtime": "2:02:23",
+    "rating": "R",
+    "poster": "https://image.tmdb.org/t/p/original/hXWBc0ioZP3cN4zCu6SN3YHXZVO.jpg",
+    "genres": [
+      "Action",
+      "Thriller",
+      "Crime"
+    ]
+  },
+  {
+    "id": 6,
+    "imdb_id": "tt6146586",
+    "title": "John Wick: Chapter 3 - Parabellum",
+    "year": 2019,
+    "runtime": "2:10:45",
+    "rating": "R",
+    "poster": "https://image.tmdb.org/t/p/original/ziEuG1essDuWuC5lpWUaw1uXY2O.jpg",
+    "genres": [
+      "Action",
+      "Thriller",
+      "Crime"
+    ]
+  },
+  {
+    "id": 7,
+    "imdb_id": "tt10366206",
+    "title": "John Wick: Chapter 4",
+    "year": 2023,
+    "runtime": "2:49:18",
+    "rating": "R",
+    "poster": "https://image.tmdb.org/t/p/original/vZloFAK7NmvMGKE7VkF5UHaz0I.jpg",
+    "genres": [
+      "Action",
+      "Thriller",
+      "Crime"
+    ]
+  },
+  {
+    "id": 8,
+    "imdb_id": "tt0117060",
+    "title": "Mission: Impossible",
+    "year": 1996,
+    "runtime": "1:50:12",
+    "rating": "PG-13",
+    "poster": "https://image.tmdb.org/t/p/original/l5uxY5m5OInWpcExIpKG6AR3rgL.jpg",
+    "genres": [
+      "Adventure",
+      "Action",
+      "Thriller"
+    ]
+  },
+  {
+    "id": 9,
+    "imdb_id": "tt9603212",
+    "title": "Mission: Impossible - Dead Reckoning Part One",
+    "year": 2023,
+    "runtime": "2:46:38",
+    "rating": "PG-13",
+    "poster": "https://image.tmdb.org/t/p/original/NNxYkU70HPurnNCSiCjYAmacwm.jpg",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Thriller"
+    ]
+  },
+  {
+    "id": 10,
+    "imdb_id": "tt4912910",
+    "title": "Mission: Impossible - Fallout",
+    "year": 2018,
+    "runtime": "2:27:25",
+    "rating": "PG-13",
+    "poster": "https://image.tmdb.org/t/p/original/AkJQpZp9WoNdj7pLYSj1L0RcMMN.jpg",
+    "genres": [
+      "Action",
+      "Adventure"
+    ]
+  },
+  {
+    "id": 11,
+    "imdb_id": "tt1229238",
+    "title": "Mission: Impossible - Ghost Protocol",
+    "year": 2011,
+    "runtime": "2:12:56",
+    "rating": "PG-13",
+    "poster": "https://image.tmdb.org/t/p/original/eRZTGx7GsiKqPch96k27LK005ZL.jpg",
+    "genres": [
+      "Action",
+      "Thriller",
+      "Adventure"
+    ]
+  },
+  {
+    "id": 12,
+    "imdb_id": "tt2381249",
+    "title": "Mission: Impossible - Rogue Nation",
+    "year": 2015,
+    "runtime": "2:11:33",
+    "rating": "PG-13",
+    "poster": "https://image.tmdb.org/t/p/original/fRJLXQBHK2wyznK5yZbO7vmsuVK.jpg",
+    "genres": [
+      "Action",
+      "Adventure"
+    ]
+  },
+  {
+    "id": 13,
+    "imdb_id": "tt9603208",
+    "title": "Mission: Impossible - The Final Reckoning",
+    "year": 2025,
+    "runtime": "2:52:54",
+    "rating": "PG-13",
+    "poster": "https://image.tmdb.org/t/p/original/z53D72EAOxGRqdr7KXXWp9dJiDe.jpg",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Thriller"
+    ]
+  },
+  {
+    "id": 14,
+    "imdb_id": "tt0120755",
+    "title": "Mission: Impossible II",
+    "year": 2000,
+    "runtime": "2:03:35",
+    "rating": "PG-13",
+    "poster": "https://image.tmdb.org/t/p/original/hfnrual76gPeNFduhD4xzHWpfTw.jpg",
+    "genres": [
+      "Adventure",
+      "Action",
+      "Thriller"
+    ]
+  },
+  {
+    "id": 15,
+    "imdb_id": "tt0317919",
+    "title": "Mission: Impossible III",
+    "year": 2006,
+    "runtime": "2:05:24",
+    "rating": "PG-13",
+    "poster": "https://image.tmdb.org/t/p/original/vKGYCpmQyV9uHybWDzXuII8Los5.jpg",
+    "genres": [
+      "Adventure",
+      "Action",
+      "Thriller"
+    ]
+  },
+  {
+    "id": 16,
+    "imdb_id": "tt9214772",
+    "title": "Monkey Man",
+    "year": 2024,
+    "runtime": "2:01:36",
+    "rating": "R",
+    "poster": "https://image.tmdb.org/t/p/original/4lhR4L2vzzjl68P1zJyCH755Oz4.jpg",
+    "genres": [
+      "Action",
+      "Thriller"
+    ]
+  },
+  {
+    "id": 17,
+    "imdb_id": "tt0903624",
+    "title": "The Hobbit: An Unexpected Journey",
+    "year": 2012,
+    "runtime": "3:02:31",
+    "rating": "PG-13",
+    "poster": "https://image.tmdb.org/t/p/original/yHA9Fc37VmpUA5UncTxxo3rTGVA.jpg",
+    "genres": [
+      "Adventure",
+      "Fantasy",
+      "Action"
+    ]
+  },
+  {
+    "id": 18,
+    "imdb_id": "tt2310332",
+    "title": "The Hobbit: The Battle of the Five Armies",
+    "year": 2014,
+    "runtime": "2:44:03",
+    "rating": "PG-13",
+    "poster": "https://image.tmdb.org/t/p/original/xT98tLqatZPQApyRmlPL12LtiWp.jpg",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ]
+  },
+  {
+    "id": 19,
+    "imdb_id": "tt1170358",
+    "title": "The Hobbit: The Desolation of Smaug",
+    "year": 2013,
+    "runtime": "3:06:35",
+    "rating": "PG-13",
+    "poster": "https://image.tmdb.org/t/p/original/xQYiXsheRCDBA39DOrmaw1aSpbk.jpg",
+    "genres": [
+      "Fantasy",
+      "Adventure",
+      "Action"
+    ]
+  },
+  {
+    "id": 20,
+    "imdb_id": "tt0120737",
+    "title": "The Lord of the Rings: The Fellowship of the Ring",
+    "year": 2001,
+    "runtime": "2:58:25",
+    "rating": "PG-13",
+    "poster": "https://image.tmdb.org/t/p/original/6oom5QYQ2yQTMJIbnvbkBL9cHo6.jpg",
+    "genres": [
+      "Adventure",
+      "Fantasy",
+      "Action"
+    ]
+  },
+  {
+    "id": 21,
+    "imdb_id": "tt0167260",
+    "title": "The Lord of the Rings: The Return of the King",
+    "year": 2003,
+    "runtime": "3:21:02",
+    "rating": "PG-13",
+    "poster": "https://image.tmdb.org/t/p/original/rCzpDGLbOoPwLjy3OAm5NUPOTrC.jpg",
+    "genres": [
+      "Adventure",
+      "Fantasy",
+      "Action"
+    ]
+  },
+  {
+    "id": 22,
+    "imdb_id": "tt0167261",
+    "title": "The Lord of the Rings: The Two Towers",
+    "year": 2002,
+    "runtime": "2:59:25",
+    "rating": "PG-13",
+    "poster": "https://image.tmdb.org/t/p/original/5VTN0pR8gcqV3EPUHHfMGnJYN9L.jpg",
+    "genres": [
+      "Adventure",
+      "Fantasy",
+      "Action"
+    ]
+  }
+]

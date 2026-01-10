@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "imdb_id": "tt4172430",
+    "title": "13 Hours: The Secret Soldiers of Benghazi",
+    "year": 2016,
+    "runtime": "2:24:29",
+    "rating": "R",
+    "poster": "https://image.tmdb.org/t/p/original/AskDcQ6Sa6jImyt2KDQbgRuPebH.jpg",
+    "genres": [
+      "War",
+      "Action",
+      "History",
+      "Drama",
+      "Thriller"
+    ]
+  },
+  {
+    "id": 2,
+    "imdb_id": "tt0377471",
+    "title": "Be Cool",
+    "year": 2005,
+    "runtime": "1:59:36",
+    "rating": "PG-13",
+    "poster": "https://image.tmdb.org/t/p/original/ekKCH7Zkb5ZTr1f1AczZY23FH.jpg",
+    "genres": [
+      "Comedy",
+      "Crime"
+    ]
+  },
+  {
+    "id": 3,
+    "imdb_id": "tt0094721",
+    "title": "Beetlejuice",
+    "year": 1988,
+    "runtime": "1:32:06",
+    "rating": "PG",
+    "poster": "https://image.tmdb.org/t/p/original/nnl6OWkyPpuMm595hmAxNW3rZFn.jpg",
+    "genres": [
+      "Fantasy",
+      "Comedy"
+    ]
+  }
+]
