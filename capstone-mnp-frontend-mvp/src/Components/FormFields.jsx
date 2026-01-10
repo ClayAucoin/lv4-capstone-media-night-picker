@@ -1,10 +1,10 @@
 // src/Components/FormFields.jsx
 
-const IS_TESTING = true
+const IS_TESTING = false
 
 let SET_TABLE
 if (IS_TESTING) {
-  SET_TABLE = "lv4_cap_recommendation_sets_temp"
+  SET_TABLE = "lv4_cap_recommendation_sets"
 } else {
   SET_TABLE = "lv4_cap_recommendation_sets"
 }

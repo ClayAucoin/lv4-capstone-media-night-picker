@@ -1,4 +1,4 @@
-# LV4 Capstone MVP
+# LV4 Capstone MVP - Media Night Picker
 
 ## Table of Contents
 
