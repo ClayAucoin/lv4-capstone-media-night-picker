@@ -3,83 +3,122 @@
 import { config } from '../config.js'
 import { sendError } from "../utils/sendError.js"
 
-export function validateAPIKey(req, res, next) {
-  // wsk = Weather Service Key
-  const wskQuery = req.query['key']
-  const w_s_k = config.weather_service_key
-  const wskHeaders = req.headers['x-api-key']
+export function validateAPIKey(req, _res, next) {
+  // ask = App Service Key
+  const askQuery = req.query['key']
+  const askHeaders = req.headers['x-api-key']
+  const a_s_k = config.app_service_key
 
-  if (!wskQuery) { return next(sendError(401, "Not authorized.", "MISSING_API_TOKEN")) }
-  if (wskQuery !== w_s_k) { return next(sendError(401, "Not authorized.", "INVALID_API_TOKEN")) }
+  if (!askQuery && !askHeaders) { return next(sendError(401, "Not authorized.", "MISSING_API_TOKEN")) }
+  if ((askQuery !== a_s_k) && (askHeaders !== a_s_k)) { return next(sendError(401, "Not authorized.", "INVALID_API_TOKEN")) }
   next()
 }
 
-export function validateWeatherQuery(req, res, next) {
-  const errors = [];
+const ALLOWED_MOODS = new Set([
+  "chill", "funny", "intense", "romantic",
+  "family", "uplifting", "mystery", "action",
+])
 
-  const { zip, date } = req.query;
+const ALLOWED_LENGTHS = new Set([
+  "LT_90", "B90_120", "B120_150", "GT_150",
+])
 
-  // ---- zip validation ----
-  if (!zip) {
-    errors.push({ field: 'zip', message: 'zip is required', value: zip })
-  } else if (!/^\d{5}$/.test(String(zip))) {
-    errors.push({ field: 'zip', message: 'zip must be a 5-digit US ZIP code', value: zip })
+function normalizeMoodsInput(input) {
+  const arr = Array.isArray(input)
+    ? input
+    : typeof input === "string"
+      ? input.split(",")
+      : []
+
+  return arr
+    .map(m => String(m).trim().toLowerCase())
+    .filter(Boolean)
+}
+
+export function validateMoodBucket(req, _res, next) {
+  try {
+    const raw = req.body?.moods
+
+    if (raw == null || String(raw).trim() === "") {
+      return next(sendError(
+        400,
+        "Mood bucket can't be empty",
+        "MOOD_BUCKET_EMPTY",
+        { allowed: [...ALLOWED_MOODS] }
+      ))
+    }
+
+    const normalized = normalizeMoodsInput(raw)
+    const unique = [...new Set(normalized)]
+    const invalid = unique.filter(m => !ALLOWED_MOODS.has(m))
+
+    if (invalid.length) {
+      return next(sendError(
+        400,
+        `Invalid moods: ${invalid.join(", ")}`,
+        "INVALID_MOODS",
+        { invalid, allowed: [...ALLOWED_MOODS] }
+      ))
+    }
+
+    req = req || {}
+    req.moods = unique.sort()
+
+    next()
+  } catch (err) {
+    next(err)
   }
+}
 
-  // ---- date validation ----
-  if (!date) {
-    errors.push({ field: 'date', message: 'date is required (YYYY-MM-DD)', value: date })
-  } else if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    errors.push({ field: 'date', message: 'date must be in YYYY-MM-DD format', value: date })
-  } else {
-    const [yearStr, monthStr, dayStr] = date.split('-');
+export function validateLengthBucket(req, _res, next) {
+  try {
+    const raw = req.body?.len_bucket
 
-    const year = Number(yearStr);
-    const month = Number(monthStr);
-    const day = Number(dayStr);
-
-    // year range
-    if (!Number.isInteger(year) || year < 1970 || year > 2150) {
-      errors.push({ field: 'date', message: 'year must be between 1970 and 2050', value: date })
+    if (raw == null || String(raw).trim() === "") {
+      return next(sendError(
+        400,
+        "Length bucket can't be empty",
+        "LENGTH_BUCKET_EMPTY",
+        { allowed: [...ALLOWED_LENGTHS] }
+      ))
     }
 
-    // month range
-    if (!Number.isInteger(month) || month < 1 || month > 12) {
-      errors.push({ field: 'date', message: 'month must be between 01 and 12', value: date })
+    const v = String(raw).trim().toUpperCase()
+    if (!ALLOWED_LENGTHS.has(v)) {
+      return next(sendError(
+        400,
+        `Invalid length bucket: ${v}`,
+        "INVALID_LENGTH_BUCKET",
+        { invalid: v, allowed: [...ALLOWED_LENGTHS] }
+      ))
     }
 
-    // day range
-    if (!Number.isInteger(day) || day < 1 || day > 31) {
-      errors.push({ field: 'date', message: 'day must be between 01 and 31', value: date })
-    }
+    req = req || {}
+    req.len_bucket = v
 
-    // date validation (no Feb 30, etc.)
-    if (errors.length === 0) {
-      const testDate = new Date(year, month - 1, day);
-
-      const valid =
-        testDate.getFullYear() === year &&
-        testDate.getMonth() === month - 1 &&
-        testDate.getDate() === day;
-
-      if (!valid) {
-        errors.push({ field: 'date', message: 'invalid calendar date', value: date })
-      }
-    }
-
-    // normalized values for returning req
-    if (errors.length === 0) {
-      req.weatherParams = {
-        zip: String(zip),
-        dateString: `${year}-${monthStr}-${dayStr}`
-      }
-    }
+    next()
+  } catch (err) {
+    next(err)
   }
+}
 
-  // ---- return errors if any ----
-  if (errors.length > 0) {
-    return next(sendError(422, "Invalid request parameters", "VALIDATION_ERROR", errors))
+export function validateWxBucket(req, _res, next) {
+  try {
+    const raw = req.body?.wx_bucket
+
+    if (raw == null || String(raw).trim() === "") {
+      return next(sendError(
+        400,
+        "Weather bucket can't be empty",
+        "WEATHER_BUCKET_EMPTY"
+      ))
+    }
+
+    req = req || {}
+    req.wx_bucket = raw.trim().toUpperCase().replace(/\s+/g, " ")
+
+    next()
+  } catch (err) {
+    next(err)
   }
-
-  return next();
 }

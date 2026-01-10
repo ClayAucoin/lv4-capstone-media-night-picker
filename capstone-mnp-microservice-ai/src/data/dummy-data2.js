@@ -2,83 +2,77 @@
 
 const dummyData2 = {
   "data": {
-    "dummy_data": "set2",
     "prompt_version": "v2",
     "recommendations": [
       {
-        "title": "Mad Max: Fury Road",
-        "year": 2015,
-        "length_bucket": "B120_150",
+        "title": "The Lion King",
+        "year": 1994,
+        "length_bucket": "LT_90",
         "moods": [
-          "action",
-          "intense"
+          "uplifting"
         ],
-        "weather_bucket": "RAIN",
-        "reason": "Mad Max: Fury Road delivers high-octane action and intense sequences, perfect for a rainy night when you want to stay cozy yet energized.",
+        "weather_bucket": "HOT",
+        "reason": "An 88‑minute uplifting animated tale that feels bright and breezy, perfect for a hot day.",
         "trakt_type": "movie",
-        "trakt_slug": "mad-max-fury-road",
-        "tmdb_id": 0,
-        "imdb_id": "tt1392190"
+        "trakt_slug": "the-lion-king",
+        "tmdb_id": 19995,
+        "imdb_id": ""
       },
       {
-        "title": "Avengers: Infinity War",
-        "year": 2018,
-        "length_bucket": "B120_150",
+        "title": "Toy Story",
+        "year": 1995,
+        "length_bucket": "LT_90",
         "moods": [
-          "action",
-          "intense"
+          "uplifting"
         ],
-        "weather_bucket": "RAIN",
-        "reason": "Avengers Infinity War offers epic action and intense battles, ideal for a rainy evening that calls for a thrilling, indoor experience.",
+        "weather_bucket": "HOT",
+        "reason": "An 81‑minute uplifting adventure that feels bright and breezy, ideal for a hot day.",
         "trakt_type": "movie",
-        "trakt_slug": "avengers-infinity-war",
-        "tmdb_id": 0,
-        "imdb_id": "tt4154796"
+        "trakt_slug": "toy-story",
+        "tmdb_id": 8628,
+        "imdb_id": ""
       },
       {
-        "title": "The Bourne Ultimatum",
-        "year": 2007,
-        "length_bucket": "B120_150",
+        "title": "The Iron Giant",
+        "year": 1999,
+        "length_bucket": "LT_90",
         "moods": [
-          "action",
-          "intense"
+          "uplifting"
         ],
-        "weather_bucket": "RAIN",
-        "reason": "The Bourne Ultimatum combines tight action and intense suspense, making it a great choice for a rainy day when you want to stay indoors and stay on edge.",
+        "weather_bucket": "HOT",
+        "reason": "A 89‑minute uplifting sci‑fi story that feels bright and breezy, great for a hot day.",
         "trakt_type": "movie",
-        "trakt_slug": "the-bourne-ultimatum",
-        "tmdb_id": 0,
-        "imdb_id": "tt0435095"
+        "trakt_slug": "the-iron-giant",
+        "tmdb_id": 11086,
+        "imdb_id": ""
       },
       {
-        "title": "Die Hard",
-        "year": 1988,
-        "length_bucket": "B120_150",
+        "title": "The Lego Movie",
+        "year": 2014,
+        "length_bucket": "LT_90",
         "moods": [
-          "action",
-          "intense"
+          "uplifting"
         ],
-        "weather_bucket": "RAIN",
-        "reason": "Die Hard packs relentless action and intense tension, making it an excellent rainy-night watch that keeps you entertained without leaving the house.",
+        "weather_bucket": "HOT",
+        "reason": "An 82‑minute uplifting, fun‑filled film that feels bright and breezy, great for a hot day.",
         "trakt_type": "movie",
-        "trakt_slug": "die-hard",
-        "tmdb_id": 0,
-        "imdb_id": "tt0095016"
+        "trakt_slug": "the-lego-movie",
+        "tmdb_id": 175084,
+        "imdb_id": ""
       },
       {
-        "title": "Mission: Impossible – Fallout",
-        "year": 2018,
-        "length_bucket": "B120_150",
+        "title": "The Lego Batman Movie",
+        "year": 2017,
+        "length_bucket": "LT_90",
         "moods": [
-          "action",
-          "intense"
+          "uplifting"
         ],
-        "weather_bucket": "RAIN",
-        "reason": "Mission: Impossible – Fallout delivers fast-paced action and intense sequences, a perfect rainy-day movie that lets you enjoy high energy while staying comfortable indoors.",
+        "weather_bucket": "HOT",
+        "reason": "An 84‑minute uplifting superhero caper that feels bright and breezy, ideal for a hot day.",
         "trakt_type": "movie",
-        "trakt_slug": "mission-impossible-fallout",
-        "tmdb_id": 0,
-        "imdb_id": "tt3856262"
+        "trakt_slug": "the-lego-batman-movie",
+        "tmdb_id": 294927,
+        "imdb_id": ""
       }
     ]
   }

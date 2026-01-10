@@ -1,13 +1,8 @@
 // src/Components/FormFields.jsx
 
 const IS_TESTING = true
-
-let SET_TABLE
-if (IS_TESTING) {
-  SET_TABLE = "lv4_cap_recommendation_sets_temp"
-} else {
-  SET_TABLE = "lv4_cap_recommendation_sets"
-}
+const SET_TABLE = "lv4_cap_recommendation_sets"
+const WX_CONDITION = "Rain, Partially cloudy"
 
 import { useState, useEffect, useCallback } from "react"
 import supabase from "../utils/supabase.js"
@@ -94,13 +89,13 @@ export default function FormFields() {
     const newSet = {
       moods: selectedMoods,
       length_bucket: length,
-      weather_bucket: "CLEAR",
+      weather_bucket: normalizeCondition(WX_CONDITION),
       prompt_version: "v0",
       variant: "default",
     }
 
     const exists = await checkQuerySignature()
-    console.log("exists:", exists)
+
     if (exists) {
       console.log(
         "Set with this signature already exists. Return items within set"
@@ -164,7 +159,7 @@ export default function FormFields() {
   const query_signature = buildQuerySignature({
     moods: selectedMoods,
     length: length,
-    weather: "CLEAR",
+    weather: normalizeCondition(WX_CONDITION),
   })
 
   async function checkQuerySignature() {
@@ -179,12 +174,13 @@ export default function FormFields() {
       return false
     }
 
-    if (data) {
-      console.log("query_signature:", query_signature)
-      console.log("signatureExists:", data)
-    }
-    console.log("(data?.length ?? 0) > 0:", (data?.length ?? 0) > 0)
     return (data?.length ?? 0) > 0
+  }
+
+  function normalizeCondition(string) {
+    const wx_bucket = (string ?? "").trim().toUpperCase().replace(/\s+/g, " ")
+
+    return wx_bucket
   }
 
   return (
@@ -331,18 +327,16 @@ export default function FormFields() {
           <div className="col-4">
             <div>
               <ul>
-                <small>
-                  {sets.length === 0 ? (
-                    <p>No sets yet.</p>
-                  ) : (
-                    sets.map((set) => (
-                      <li key={set.id}>
-                        {normalizeMoods(set.moods)}, {set.length_bucket},{" "}
-                        {set.weather_bucket}
-                      </li>
-                    ))
-                  )}
-                </small>
+                {sets.length === 0 ? (
+                  <p>No sets yet.</p>
+                ) : (
+                  sets.map((set) => (
+                    <li key={set.id} className="signature-display">
+                      {normalizeMoods(set.moods)}, {set.length_bucket},{" "}
+                      {set.weather_bucket}
+                    </li>
+                  ))
+                )}
               </ul>
             </div>
           </div>

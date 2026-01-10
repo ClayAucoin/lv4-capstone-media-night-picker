@@ -1,7 +1,7 @@
 // src/routes/read.js
 
 import express from "express"
-import { validateAPIKey, validateWeatherQuery } from "../middleware/validators.js"
+import { validateAPIKey, validateMoodBucket, validateLengthBucket, validateWxBucket } from "../middleware/validators.js"
 import { config } from "../config.js"
 import { dummyDataSets } from "../data/data-sets.js"
 import { sendError } from "../utils/sendError.js"
@@ -9,32 +9,27 @@ import { OpenAI } from "openai"
 
 const router = express.Router()
 
+// 'chill','funny','intense','romantic','family','uplifting','mystery','action'
 // 'CLEAR','RAIN','COLD','HOT','STORM'
+// 'LT_90','B90_120','B120_150','GT_150'
 
 // ---- GET /api/v1/ai?t=true route ----
-router.get('/', async (req, res, next) => {
+router.get('/', validateAPIKey, validateMoodBucket, validateLengthBucket, validateWxBucket, async (req, res, next) => {
   console.log('GET /api/v1/ai')
   const is_testing = parseBoolean(req.query.t)
 
-  const LENGTH_BUCKET_LABELS = {
-    LT_90: "Less than 90 minutes",
-    B90_120: "Between 90 and 120 minutes",
-    B120_150: "Between 120 and 150 minutes",
-    GT_150: "Greater than 150 minutes",
-  };
-
-  const apiKey = config.weather_key
-
   const count = 5
-  const moods = ["uplifting", "mystery"]
-  const len_bucket = "B90_120"
-  const wx_bucket = "HOT"
+  const moods = req.moods?.length ? req.moods : ["uplifting", "mystery"]
+  const len_bkt = req.len_bucket ?? "B90_120"
+  const wx_bkt = req.body?.wx_bucket ?? "HOT"
   const prompt_version = "v2"
+
+  // const apiKey = config.app_service_key
 
   const inputParameters = {
     count,
-    len_bucket,
-    wx_bucket,
+    len_bkt,
+    wx_bkt,
     prompt_version,
     moods
   }
@@ -72,8 +67,8 @@ Integration note:
 
 Input (user request):
 - requested_moods: ${JSON.stringify(moods)}   (must be from allowed moods; lowercase)
-- length_requirement: ${len_bucket}  (use this exact enum in output)
-- weather_context: ${wx_bucket}      (use this exact enum in output)
+- length_requirement: ${len_bkt}  (use this exact enum in output)
+- weather_context: ${wx_bkt}      (use this exact enum in output)
 - count: ${count}
 
 Rules:
@@ -90,16 +85,16 @@ Rules:
 - imdb_id must be "" or match ^tt\\d{7,8}$.
 - Always include "year" to help downstream ID resolution.
 - Every recommendation MUST set:
-  - "length_bucket" exactly as "${len_bucket}"
-  - "weather_bucket" exactly as "${wx_bucket}"
+  - "length_bucket" exactly as "${len_bkt}"
+  - "weather_bucket" exactly as "${wx_bkt}"
 - The "moods" array must contain 1 or 2 values ONLY from requested_moods (no other moods).
 - "reason" must be 1-2 practical sentences connecting mood + weather vibe + runtime.
 - Do NOT output any enum value outside the allowed lists. If you cannot comply, return:
 {"prompt_version":"v2","recommendations":[]}
 
 Self-check before output:
-- length_bucket is exactly "${len_bucket}" for every item
-- weather_bucket is exactly "${wx_bucket}" for every item
+- length_bucket is exactly "${len_bkt}" for every item
+- weather_bucket is exactly "${wx_bkt}" for every item
 - moods are only from requested_moods
 - trakt_type is "movie" for every item
 - trakt_slug is either a string you are confident in or null
@@ -155,7 +150,7 @@ Output JSON schema EXACTLY:
     picked
 
   try {
-    res.json({ data: dataOut })
+    res.json({ inputParameters, data: dataOut })
   } catch (err) {
     console.error(err)
     return next(sendError(500, "Internal server error", "INTERNAL_ERROR", {
@@ -197,3 +192,4 @@ function parseBoolean(value = "true") {
 function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
+

@@ -19,3 +19,7 @@
   --bs-btn-padding-x: .5rem;
   --bs-btn-font-size: .75rem;
 }
+
+.signature-display {
+  font-size: xx-small;
+}
