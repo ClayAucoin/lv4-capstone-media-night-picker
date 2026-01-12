@@ -9,6 +9,7 @@ export const config = {
   nodeEnv: process.env.NODE_ENV || "development",
   apiKey: process.env.API_KEY || "",
   wx_api_key: process.env.WEATHER_API_KEY || "",
+  ai_api_key: process.env.AI_API_KEY || "",
 
   dbUrl: process.env.DB_URL || ""
 }

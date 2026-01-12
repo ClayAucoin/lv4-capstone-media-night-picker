@@ -5,12 +5,13 @@ import { sendError } from "../utils/sendError.js"
 
 export function validateAPIKey(req, _res, next) {
   // ask = App Service Key
-  const askQuery = req.query['key']
-  const askHeaders = req.headers['x-api-key']
   const a_s_k = config.app_service_key
+  const askQuery = req.query?.key
+  const askHeaders = req.headers['x-api-key']
 
+  const isValid = askQuery === a_s_k || askHeaders === a_s_k
   if (!askQuery && !askHeaders) { return next(sendError(401, "Not authorized.", "MISSING_API_TOKEN")) }
-  if ((askQuery !== a_s_k) && (askHeaders !== a_s_k)) { return next(sendError(401, "Not authorized.", "INVALID_API_TOKEN")) }
+  if (!isValid) { return next(sendError(401, "Not authorized.", "INVALID_API_TOKEN")) }
   next()
 }
 
@@ -78,7 +79,7 @@ export function validateMoodBucket(req, _res, next) {
 
 export function validateLengthBucket(req, _res, next) {
   try {
-    const raw = req.body?.len_bucket
+    const raw = req.body?.len_bkt
 
     const is_testing = parseBoolean(req.query.t)
 
@@ -103,9 +104,9 @@ export function validateLengthBucket(req, _res, next) {
       }
 
       req = req || {}
-      req.len_bucket = v
+      req.len_bkt = v
     } else {
-      req.len_bucket = "B90_120"
+      req.len_bkt = "B90_120"
     }
 
     next()
@@ -116,7 +117,7 @@ export function validateLengthBucket(req, _res, next) {
 
 export function validateWxBucket(req, _res, next) {
   try {
-    const raw = req.body?.wx_bucket
+    const raw = req.body?.wx_bkt
 
     const is_testing = parseBoolean(req.query.t)
 
@@ -130,9 +131,9 @@ export function validateWxBucket(req, _res, next) {
       }
 
       req = req || {}
-      req.wx_bucket = raw.trim().toUpperCase().replace(/\s+/g, " ")
+      req.wx_bkt = raw.trim().toUpperCase().replace(/\s+/g, " ")
     } else {
-      req.wx_bucket = "HOT"
+      req.wx_bkt = "HOT"
     }
 
     next()

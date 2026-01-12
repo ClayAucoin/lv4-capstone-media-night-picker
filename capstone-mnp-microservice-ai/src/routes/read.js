@@ -15,13 +15,13 @@ const router = express.Router()
 
 // ---- GET /api/v1/ai?t=true route ----
 router.get('/', validateAPIKey, validateMoodBucket, validateLengthBucket, validateWxBucket, async (req, res, next) => {
-  console.log('GET /api/v1/ai')
+  console.log('GET /')
   const is_testing = parseBoolean(req.query.t)
 
   const count = 5
   const moods = req.moods?.length ? req.moods : ["uplifting", "mystery"]
-  const len_bkt = req.len_bucket ?? "B90_120"
-  const wx_bkt = req.body?.wx_bucket ?? "HOT"
+  const len_bkt = req.len_bkt ?? "B90_120"
+  const wx_bkt = req.body?.wx_bkt ?? "HOT"
   const prompt_version = "v2"
 
   // const apiKey = config.app_service_key
@@ -120,6 +120,7 @@ Output JSON schema EXACTLY:
   ]
 }`.trim();
 
+  const tempTesting = true
   let data
   if (!is_testing) {
     const client = new OpenAI({
