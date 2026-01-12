@@ -5,12 +5,13 @@ import { sendError } from "../utils/sendError.js"
 
 export function validateAPIKey(req, res, next) {
   // wsk = Weather Service Key
-  const wskQuery = req.query['key']
   const w_s_k = config.weather_service_key
+  const wskQuery = req.query?.key
   const wskHeaders = req.headers['x-api-key']
 
-  if (!wskQuery) { return next(sendError(401, "Not authorized.", "MISSING_API_TOKEN")) }
-  if (wskQuery !== w_s_k) { return next(sendError(401, "Not authorized.", "INVALID_API_TOKEN")) }
+  const isValid = wskQuery === w_s_k || wskHeaders === w_s_k
+  if (!wskQuery && !wskHeaders) { return next(sendError(401, "Not authorized.", "MISSING_API_TOKEN")) }
+  if (!isValid) { return next(sendError(401, "Not authorized.", "INVALID_API_TOKEN")) }
   next()
 }
 

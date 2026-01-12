@@ -5,10 +5,6 @@ import cors from "cors"
 // utils
 import { sendError } from "./utils/sendError.js"
 
-// middleware
-// import fileLogger from "./middleware/fileLogger.js"
-import colorLogger from "./middleware/colorLogger.js"
-
 // import routes
 import rootRouter from "./routes/root.js"
 import itemsRouter from "./routes/items.js"
@@ -20,13 +16,9 @@ app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 
-// middleware: use log files
-// app.use(fileLogger)
-app.use(colorLogger)
-
 // use routes
 app.use("/", rootRouter)
-app.use("/items", itemsRouter)
+app.use("/api/v1", itemsRouter)
 
 
 export function globalErrorHandler(err, req, res, next) {

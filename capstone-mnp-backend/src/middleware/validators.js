@@ -1,6 +1,7 @@
 // src/utils/validators.js
 
-import { sendError } from "../utils/sendError.js";
+import { sendError } from "../utils/sendError.js"
+import { config } from "../config.js"
 
 export function validateId(req, res, next) {
   // console.log("validateId: id:", req.params.id, "typeof:", typeof req.params.id)
@@ -14,6 +15,20 @@ export function validateId(req, res, next) {
   if (numId <= 0) { return next(sendError(400, `"id" must be greater than 0`, "INVALID_ID", { value: numId })) }
 
   next();
+}
+
+export function validateAPIKey(req, _res, next) {
+  // wsk = Weather Service Key
+  const w_s_k = config.wx_api_key
+  const wskQuery = req.query?.key
+  const wskHeaders = req.headers['x-api-key']
+
+  console.log("wskHeaders:", wskHeaders)
+
+  const isValid = wskQuery === w_s_k || wskHeaders === w_s_k
+  if (!wskQuery && !wskHeaders) { return next(sendError(401, "Not authorized.", "MISSING_API_TOKEN")) }
+  if (!isValid) { return next(sendError(401, "Not authorized.", "INVALID_API_TOKEN")) }
+  next()
 }
 
 export function validateMovieBody(req, res, next) {
