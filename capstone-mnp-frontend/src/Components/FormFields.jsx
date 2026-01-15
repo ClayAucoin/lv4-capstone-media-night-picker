@@ -255,7 +255,7 @@ export default function FormFields() {
               </div>
 
               <div className="d-flex justify-content-center">
-                <div className="d-flex justify-content-around flex-wrap gap-2 w-75">
+                <div className="d-flex justify-content-around flex-wrap gap-2">
                   {MOODS.map((m) => {
                     const active = selectedMoods.includes(m.value)
                     return (

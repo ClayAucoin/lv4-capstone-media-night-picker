@@ -9,22 +9,31 @@ const router = express.Router()
 
 router.get("/ai", validateAIAPIKey, async (req, res, next) => {
 
-  const url = "http://localhost:3105/api/v1/ai?"
-  const t = "true" // t = testing
+  const url = "https://lv4.ai.clayaucoin.foo/"
+  // const url = "http://localhost:3105/api/v1/ai?"
+  const t = "false" // t = testing
 
   const apiHeader = config.ai_api_key
   const baseUrl = url + "t=" + t
 
-  console.log(".env:", config.ai_api_key)
-  console.log("baseUrl:", baseUrl)
+  // console.log(".env:", config.ai_api_key)
+  // console.log("baseUrl:", baseUrl)
 
   try {
     const response = await fetch(baseUrl, {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         "x-api-key": apiHeader,
       },
+      body: JSON.stringify({
+        "len_bkt": "LT_90",
+        "wx_bkt": "Partially cloudy",
+        "moods": [
+          "uplifting",
+          "action"
+        ]
+      }),
     })
     const data = await response.json()
     console.log("GET /read-ai")

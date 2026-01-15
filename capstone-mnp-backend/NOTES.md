@@ -1,29 +1,42 @@
-## Weather Microservice
+## Backend accessing microservices
 
-### Access weather microservice
+[/api/v1/wx](http://localhost:3000/api/v1/wx?key=3OnZ918Kq8x7J8CwCy61o0d81F1UCHyZ)
+[/api/v1/ai](http://localhost:3000/api/v1/ai?t=true&key=tvVuWbyimYzsU5n27YL286M6DOF0L5oR)
+
+## Read from microservices directly
+
+### Weather Microservice
+
+#### Access weather microservice
 
 - https://weather.clayaucoin.foo
 - http://localhost:3100
 
-- /api/v1/weather?zip=70123&date=2025-12-25&key=3OnZ918Kq8x7J8CwCy61o0d81F1UCHyZ
+/api/v1/weather?zip=70123&date=2025-12-25&key=3OnZ918Kq8x7J8CwCy61o0d81F1UCHyZ
 
-#### Weather microservice key
+http://localhost:3100/api/v1/weather?zip=70123&date=2025-12-25&key=3OnZ918Kq8x7J8CwCy61o0d81F1UCHyZ
+https://weather.clayaucoin.foo/api/v1/weather?zip=70123&date=2025-12-25&key=3OnZ918Kq8x7J8CwCy61o0d81F1UCHyZ
+
+##### Weather microservice key
 
 - 3OnZ918Kq8x7J8CwCy61o0d81F1UCHyZ
 
-## AI Microservice
+### AI Microservice
 
-### Access AI microservice
+#### Access AI microservice
 
 - https://lv4.ai.clayaucoin.foo
 - http://localhost:3200
 
-#### If testing
+##### If testing
 
 - t=true
 
-- /api/v1/ai?t=true&key=tvVuWbyimYzsU5n27YL286M6DOF0L5oR
+/api/v1/ai?t=true&key=tvVuWbyimYzsU5n27YL286M6DOF0L5oR
 
-#### AI API Key
+http://localhost:3105/api/v1/ai?t=true&key=tvVuWbyimYzsU5n27YL286M6DOF0L5oR
+https://lv4.ai.clayaucoin.foo/api/v1/ai?t=true&key=tvVuWbyimYzsU5n27YL286M6DOF0L5oR
+
+##### AI API Key
 
 - tvVuWbyimYzsU5n27YL286M6DOF0L5oR

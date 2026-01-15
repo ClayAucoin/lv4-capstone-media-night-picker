@@ -15,10 +15,10 @@ export function validateAPIKey(req, res, next) {
   next()
 }
 
-export function validateWeatherQuery(req, res, next) {
+export function validateHeaderVars(req, res, next) {
   const errors = [];
 
-  const { zip, date } = req.query;
+  const { zip, date } = req.body
 
   // ---- zip validation ----
   if (!zip) {
@@ -71,8 +71,8 @@ export function validateWeatherQuery(req, res, next) {
     // normalized values for returning req
     if (errors.length === 0) {
       req.weatherParams = {
-        zip: String(zip),
-        dateString: `${year}-${monthStr}-${dayStr}`
+        dateString: `${year}-${monthStr}-${dayStr}`,
+        zip: String(zip)
       }
     }
   }

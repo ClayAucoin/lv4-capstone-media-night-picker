@@ -23,8 +23,6 @@ export function validateWxAPIKey(req, _res, next) {
   const wskQuery = req.query?.key
   const wskHeaders = req.headers['x-api-key']
 
-  console.log("wskHeaders:", wskHeaders)
-
   const isValid = wskQuery === w_s_k || wskHeaders === w_s_k
   if (!wskQuery && !wskHeaders) { return next(sendError(401, "Not authorized.", "MISSING_API_TOKEN")) }
   if (!isValid) { return next(sendError(401, "Not authorized.", "INVALID_API_TOKEN")) }
@@ -36,8 +34,6 @@ export function validateAIAPIKey(req, _res, next) {
   const ai_s_k = config.ai_api_key
   const aiskQuery = req.query?.key
   const aiskHeaders = req.headers['x-api-key']
-
-  console.log("wskHeaders:", aiskHeaders)
 
   const isValid = aiskQuery === ai_s_k || aiskHeaders === ai_s_k
   if (!aiskQuery && !aiskHeaders) { return next(sendError(401, "Not authorized.", "MISSING_API_TOKEN")) }

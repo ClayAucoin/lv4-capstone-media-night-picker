@@ -1,18 +1,17 @@
 // src/routes/read.js
 
 import express from "express"
-import { validateAPIKey, validateWeatherQuery } from "../middleware/validators.js"
+import { validateAPIKey, validateHeaderVars } from "../middleware/validators.js"
 import { config } from "../config.js"
 import { sendError } from "../utils/sendError.js"
 
 const router = express.Router()
 
-// ---- GET /api/v1/weather route ----
-router.get('/', validateAPIKey, validateWeatherQuery, async (req, res, next) => {
-  console.log('GET /api/v1/weather')
-  const { zip, dateString } = req.weatherParams
+// ---- POST /api/v1/weather route ----
+router.post('/', validateAPIKey, validateHeaderVars, async (req, res, next) => {
+  console.log('POST /api/v1/weather')
 
-  // console.log("date:", dateString)
+  const { zip, dateString } = req.weatherParams
 
   const apiKey = config.weather_key
   const baseUrl = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${zip}/${dateString}`;

@@ -8,7 +8,7 @@ import { config } from "../config.js"
 const router = express.Router()
 
 router.get("/wx", validateWxAPIKey, async (req, res, next) => {
-
+  // const url = "https://weather.clayaucoin.foo/api/v1/weather?"
   const url = "http://localhost:3100/api/v1/weather?"
   const zip = "70123"
   const date = "2026-03-13"

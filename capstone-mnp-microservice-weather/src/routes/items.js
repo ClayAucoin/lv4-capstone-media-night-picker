@@ -7,6 +7,6 @@ import readRouter from "./read.js"
 
 const itemsRouter = express.Router()
 
-itemsRouter.use("/", readRouter)      // GET /items/
+itemsRouter.use("/", readRouter)      // POST /items/
 
 export default itemsRouter

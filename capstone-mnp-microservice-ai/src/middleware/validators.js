@@ -38,7 +38,10 @@ function normalizeMoodsInput(input) {
 
 export function validateMoodBucket(req, _res, next) {
   try {
-    const raw = req.body?.moods
+    const raw = req.headers['x-moods']
+    // const raw = req.body?.moods
+
+    console.log("raw moods:", raw)
 
     const is_testing = parseBoolean(req.query.t)
 

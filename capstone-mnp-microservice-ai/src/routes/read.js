@@ -24,8 +24,6 @@ router.get('/', validateAPIKey, validateMoodBucket, validateLengthBucket, valida
   const wx_bkt = req.body?.wx_bkt ?? "HOT"
   const prompt_version = "v2"
 
-  // const apiKey = config.app_service_key
-
   const inputParameters = {
     count,
     len_bkt,
@@ -90,7 +88,7 @@ Rules:
 - The "moods" array must contain 1 or 2 values ONLY from requested_moods (no other moods).
 - "reason" must be 1-2 practical sentences connecting mood + weather vibe + runtime.
 - Do NOT output any enum value outside the allowed lists. If you cannot comply, return:
-{"prompt_version":"v2","recommendations":[]}
+{"prompt_version":"v2","recommendations":[{"status": "can't comply"}]}
 
 Self-check before output:
 - length_bucket is exactly "${len_bkt}" for every item
@@ -151,7 +149,11 @@ Output JSON schema EXACTLY:
     picked
 
   try {
-    res.json({ inputParameters, data: dataOut })
+    res.json({
+      // prompt: prompt,
+      inputParameters,
+      data: dataOut
+    })
   } catch (err) {
     console.error(err)
     return next(sendError(500, "Internal server error", "INTERNAL_ERROR", {
