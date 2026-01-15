@@ -1,3 +1,12 @@
+## To-do
+
+- Root router
+  - add directions
+
+## Wishlist
+
+- Verify zip is valid US Zip Code
+
 ## Backend accessing microservices
 
 [/api/v1/wx](http://localhost:3000/api/v1/wx?key=3OnZ918Kq8x7J8CwCy61o0d81F1UCHyZ)

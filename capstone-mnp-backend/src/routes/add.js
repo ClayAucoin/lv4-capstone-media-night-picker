@@ -2,7 +2,7 @@
 
 import express from "express"
 import data from "../data.js"
-import { validateMovieBody } from "../middleware/validators.js"
+// import { validateMovieBody } from "../middleware/validators.js"
 import { sendError } from "../utils/sendError.js"
 import { randomUUID } from 'node:crypto'
 
@@ -10,7 +10,7 @@ const router = express.Router()
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }))
 
-router.post("/", validateMovieBody, (req, res, next) => {
+router.post("/", (req, res, next) => {
   console.log("POST /find", req.body)
   // to use randomUUID id 
   // const newMovie = req.body

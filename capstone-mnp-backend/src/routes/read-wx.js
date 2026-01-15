@@ -2,27 +2,40 @@
 
 import express from "express"
 import { sendError } from "../utils/sendError.js"
-import { validateWxAPIKey } from "../middleware/validators.js"
+import { validateWxAPIKey } from "../middleware/validator-keys.js"
+import { validateWeatherVars } from "../middleware/validator-wx.js"
 import { config } from "../config.js"
 
 const router = express.Router()
 
-router.get("/wx", validateWxAPIKey, async (req, res, next) => {
-  // const url = "https://weather.clayaucoin.foo/api/v1/weather?"
-  const url = "http://localhost:3100/api/v1/weather?"
-  const zip = "70123"
-  const date = "2026-03-13"
+router.post("/wx", validateWxAPIKey, validateWeatherVars, async (req, res, next) => {
+  console.log('POST /wx')
+
+  const is_testing = parseBoolean(req.query.t)
+
+  let url
+  if (!is_testing) {
+    url = "https://weather.clayaucoin.foo/api/v1/weather?"
+  } else {
+    url = "http://localhost:3100/api/v1/weather?"
+  }
+
+  const { zip, dateString } = req.weatherParams
 
   const apiHeader = config.wx_api_key
-  const baseUrl = url + "zip=" + zip + "&date=" + date
+  const baseUrl = url + "t=" + true
 
   try {
     const response = await fetch(baseUrl, {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         "x-api-key": apiHeader,
       },
+      body: JSON.stringify({
+        "zip": zip,
+        "date": dateString
+      }),
     })
     const data = await response.json()
     console.log("GET /read-wx")
@@ -37,3 +50,10 @@ router.get("/wx", validateWxAPIKey, async (req, res, next) => {
 })
 
 export default router
+
+function parseBoolean(value = "true") {
+  const v = value.toLowerCase()
+  if (v === "true") return true
+  if (v === "false") return false
+  return value
+}

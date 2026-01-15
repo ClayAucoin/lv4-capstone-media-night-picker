@@ -2,16 +2,22 @@
 
 import express from "express"
 import { sendError } from "../utils/sendError.js"
-import { validateAIAPIKey } from "../middleware/validators.js"
+import { validateAIAPIKey } from "../middleware/validator-keys.js"
+import { validateMoodBucket, validateLengthBucket, validateWxBucket } from "../middleware/validator-ai.js"
 import { config } from "../config.js"
 
 const router = express.Router()
 
-router.get("/ai", validateAIAPIKey, async (req, res, next) => {
+router.post("/ai", validateAIAPIKey, async (req, res, next) => {
 
-  const url = "https://lv4.ai.clayaucoin.foo/"
-  // const url = "http://localhost:3105/api/v1/ai?"
-  const t = "false" // t = testing
+  let url
+  if (!is_testing) {
+    url = "https://weather.clayaucoin.foo/api/v1/weather?"
+  } else {
+    url = "http://localhost:3100/api/v1/weather?"
+  }
+
+  const t = "true" // t = testing
 
   const apiHeader = config.ai_api_key
   const baseUrl = url + "t=" + t
