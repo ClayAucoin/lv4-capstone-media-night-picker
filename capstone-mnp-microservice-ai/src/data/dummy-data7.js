@@ -1,17 +1,8 @@
 // src/data/dummy-data7.js
 
 const dummyData7 = {
-  "inputParameters": {
-    "count": 5,
-    "len_bkt": "B120_150",
-    "wx_bkt": "COLD",
-    "prompt_version": "v2",
-    "mood_bkt": [
-      "chill",
-      "romantic"
-    ]
-  },
   "data": {
+    "dummy_data": "set7",
     "prompt_version": "v2",
     "recommendations": [
       {

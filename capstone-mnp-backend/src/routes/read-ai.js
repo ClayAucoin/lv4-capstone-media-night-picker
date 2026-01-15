@@ -8,19 +8,29 @@ import { config } from "../config.js"
 
 const router = express.Router()
 
-router.post("/ai", validateAIAPIKey, async (req, res, next) => {
+router.post("/ai", validateAIAPIKey, validateMoodBucket, validateLengthBucket, validateWxBucket, async (req, res, next) => {
+
+  const is_testing = parseBoolean(req.query.t)
+  const local = parseBoolean(req.query.l)
 
   let url
-  if (!is_testing) {
-    url = "https://weather.clayaucoin.foo/api/v1/weather?"
+  let where
+  if (!local) {
+    url = "https://lv4.ai.clayaucoin.foo/api/v1/ai?"
+    where = "online"
   } else {
-    url = "http://localhost:3100/api/v1/weather?"
+    url = "http://localhost:3105/api/v1/ai?"
+    where = "local"
   }
 
   const t = "true" // t = testing
 
   const apiHeader = config.ai_api_key
   const baseUrl = url + "t=" + t
+
+  const moods = req.moods
+  const len_bkt = req.len_bkt
+  const wx_bkt = req.wx_bkt
 
   try {
     const response = await fetch(baseUrl, {
@@ -30,18 +40,17 @@ router.post("/ai", validateAIAPIKey, async (req, res, next) => {
         "x-api-key": apiHeader,
       },
       body: JSON.stringify({
-        "len_bkt": "LT_90",
-        "wx_bkt": "Partially cloudy",
-        "moods": [
-          "uplifting",
-          "action"
-        ]
+        "len_bkt": len_bkt,
+        "wx_bkt": wx_bkt,
+        "moods": moods
       }),
     })
     const data = await response.json()
-    console.log("GET /read-ai")
+    console.log("GET /ai")
     res.status(200).json({
       ok: true,
+      testing: is_testing,
+      where: where,
       data: data,
     })
   } catch (err) {
@@ -50,3 +59,10 @@ router.post("/ai", validateAIAPIKey, async (req, res, next) => {
 })
 
 export default router
+
+function parseBoolean(value = "true") {
+  const v = value.toLowerCase()
+  if (v === "true") return true
+  if (v === "false") return false
+  return value
+}

@@ -1,6 +1,5 @@
 // src/data/dummy-data3.js
 
-
 const dummyData3 = {
   "data": {
     "dummy_data": "set3",

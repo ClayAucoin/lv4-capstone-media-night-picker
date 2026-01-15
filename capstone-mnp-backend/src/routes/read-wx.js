@@ -9,12 +9,11 @@ import { config } from "../config.js"
 const router = express.Router()
 
 router.post("/wx", validateWxAPIKey, validateWeatherVars, async (req, res, next) => {
-  console.log('POST /wx')
 
-  const is_testing = parseBoolean(req.query.t)
+  const local = parseBoolean(req.query.l)
 
   let url
-  if (!is_testing) {
+  if (!local) {
     url = "https://weather.clayaucoin.foo/api/v1/weather?"
   } else {
     url = "http://localhost:3100/api/v1/weather?"
@@ -41,6 +40,7 @@ router.post("/wx", validateWxAPIKey, validateWeatherVars, async (req, res, next)
     console.log("GET /read-wx")
     res.status(200).json({
       ok: true,
+      local: local,
       data: data,
       conditions: data.conditions
     })

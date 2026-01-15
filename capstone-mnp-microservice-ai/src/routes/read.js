@@ -118,7 +118,6 @@ Output JSON schema EXACTLY:
   ]
 }`.trim();
 
-  const tempTesting = true
   let data
   if (!is_testing) {
     const client = new OpenAI({
@@ -150,6 +149,8 @@ Output JSON schema EXACTLY:
 
   try {
     res.json({
+      ok: true,
+      testing: is_testing,
       inputParameters,
       data: dataOut
     })
