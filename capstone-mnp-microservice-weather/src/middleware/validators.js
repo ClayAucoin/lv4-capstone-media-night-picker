@@ -15,7 +15,7 @@ export function validateAPIKey(req, res, next) {
   next()
 }
 
-export function validateHeaderVars(req, res, next) {
+export function validateWeatherVars(req, res, next) {
   const errors = [];
 
   const { zip, date } = req.body

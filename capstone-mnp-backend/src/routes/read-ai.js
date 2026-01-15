@@ -16,9 +16,6 @@ router.get("/ai", validateAIAPIKey, async (req, res, next) => {
   const apiHeader = config.ai_api_key
   const baseUrl = url + "t=" + t
 
-  // console.log(".env:", config.ai_api_key)
-  // console.log("baseUrl:", baseUrl)
-
   try {
     const response = await fetch(baseUrl, {
       method: "POST",
