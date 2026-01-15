@@ -2,6 +2,7 @@
 
 const dummyData2 = {
   "data": {
+    "dummy_data": "set2",
     "prompt_version": "v2",
     "recommendations": [
       {

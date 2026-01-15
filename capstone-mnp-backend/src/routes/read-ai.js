@@ -16,24 +16,22 @@ router.post("/ai", validateAIAPIKey, validateMoodBucket, validateLengthBucket, v
   let url
   let where
   if (!local) {
-    url = "https://lv4.ai.clayaucoin.foo/api/v1/ai?"
+    url = `https://lv4.ai.clayaucoin.foo/api/v1/ai?t=${is_testing}`
     where = "online"
   } else {
-    url = "http://localhost:3105/api/v1/ai?"
+    url = `http://localhost:3105/api/v1/ai?t=${is_testing}`
     where = "local"
   }
 
-  const t = "true" // t = testing
-
   const apiHeader = config.ai_api_key
-  const baseUrl = url + "t=" + t
+  // const baseUrl = url + "t=" + is_testing
 
   const moods = req.moods
   const len_bkt = req.len_bkt
   const wx_bkt = req.wx_bkt
 
   try {
-    const response = await fetch(baseUrl, {
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -46,7 +44,7 @@ router.post("/ai", validateAIAPIKey, validateMoodBucket, validateLengthBucket, v
       }),
     })
     const data = await response.json()
-    console.log("GET /ai")
+    console.log("POST /ai")
     res.status(200).json({
       ok: true,
       testing: is_testing,

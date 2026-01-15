@@ -35,7 +35,6 @@ function todayLocalYYYYMMDD() {
 
 export default function FormFields() {
   const [sets, setSets] = useState([])
-  const [result, setResult] = useState([])
 
   // get sets from table
   const getSets = useCallback(async () => {
@@ -87,40 +86,101 @@ export default function FormFields() {
 
   async function handleSubmit() {
     // get values from form
-    const payload = {
-      pv: "v1",
-      zip: String(zip).trim(),
-      date: date,
-      len_bkt: length,
+    const newSet = {
       moods: selectedMoods,
-    }
-    console.log("payload:", payload)
-
-    const baseUrl = "http://localhost:3000/api/v1/submit?t=false&l=true"
-
-    const response = await fetch(baseUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": import.meta.env.VITE_API_KEY,
-      },
-      body: JSON.stringify(payload),
-    })
-
-    const text = await response.text()
-    let data
-    try {
-      data = JSON.parse(text)
-    } catch {
-      throw new Error("Backend returned non-JSON")
+      length_bucket: length,
+      weather_bucket: normalizeCondition(WX_CONDITION),
+      prompt_version: "v0",
+      variant: "default",
     }
 
-    if (!response.ok) {
-      throw new Error(data?.error?.message ?? "Request failed")
+    const exists = await checkQuerySignature()
+
+    if (exists) {
+      console.log(
+        "Set with this signature already exists. Return items within set"
+      )
+      return
     }
 
-    setResult(data)
+    const { error } = await supabase
+      .from(SET_TABLE)
+      .insert(newSet)
+      .select()
+      .single()
+
+    if (error) {
+      console.error("insert error:", error.message)
+      return
+    }
+
     setSets(await getSets())
+  }
+
+  // query_signature
+  // moods=chill,mystery|len=B90_120|wx=STORM|pv=v1|var=default
+
+  // format moods for signature
+  function normalizeMoods(moods = []) {
+    return moods
+      .map((m) => m.toLowerCase().trim())
+      .sort()
+      .join(",")
+  }
+
+  // format signature for lookup
+  function buildQuerySignature({
+    moods = [],
+    length,
+    weather,
+    pv = "v0",
+    variant = "default",
+  }) {
+    const parts = []
+
+    if (moods.length) {
+      parts.push(`moods=${normalizeMoods(moods)}`)
+    }
+
+    if (length) {
+      parts.push(`len=${length}`)
+    }
+
+    if (weather) {
+      parts.push(`wx=${weather}`)
+    }
+
+    parts.push(`pv=${pv}`)
+    parts.push(`var=${variant}`)
+
+    return parts.join("|")
+  }
+
+  const query_signature = buildQuerySignature({
+    moods: selectedMoods,
+    length: length,
+    weather: normalizeCondition(WX_CONDITION),
+  })
+
+  async function checkQuerySignature() {
+    const { data, error } = await supabase
+      .from(SET_TABLE)
+      .select("query_signature")
+      .eq("query_signature", query_signature)
+      .limit(1)
+
+    if (error) {
+      console.error("checkQuerySignature error:", error.message)
+      return false
+    }
+
+    return (data?.length ?? 0) > 0
+  }
+
+  function normalizeCondition(string) {
+    const wx_bucket = (string ?? "").trim().toUpperCase().replace(/\s+/g, " ")
+
+    return wx_bucket
   }
 
   return (
@@ -263,11 +323,6 @@ export default function FormFields() {
                 )}
               </small>
             </pre>
-            <div>
-              <pre className="json-display">
-                {result ? JSON.stringify(result, null, 2) : ""}
-              </pre>
-            </div>
           </div>
           <div className="col-4">
             <div>
@@ -284,25 +339,9 @@ export default function FormFields() {
                 )}
               </ul>
             </div>
-            {/* <div>
-              <pre className="signature-display">
-                {result ? JSON.stringify(result, null, 2) : ""}
-              </pre>
-            </div> */}
           </div>
         </div>
       </div>
     </>
   )
-}
-
-// query_signature
-// moods=chill,mystery|len=B90_120|wx=STORM|pv=v1|var=default
-
-// format moods for signature
-function normalizeMoods(moods = []) {
-  return moods
-    .map((m) => m.toLowerCase().trim())
-    .sort()
-    .join(",")
 }
