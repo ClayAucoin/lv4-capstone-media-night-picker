@@ -13,15 +13,15 @@ const router = express.Router()
 // 'CLEAR','RAIN','COLD','HOT','STORM'
 // 'LT_90','B90_120','B120_150','GT_150'
 
-// ---- GET /api/v1/ai?t=true route ----
-router.get('/', validateAPIKey, validateMoodBucket, validateLengthBucket, validateWxBucket, async (req, res, next) => {
-  console.log('GET /')
+// ---- POST /api/v1/ai?t=true route ----
+router.post('/', validateAPIKey, validateMoodBucket, validateLengthBucket, validateWxBucket, async (req, res, next) => {
+  console.log('POST /')
   const is_testing = parseBoolean(req.query.t)
 
   const count = 5
-  const moods = req.moods?.length ? req.moods : ["uplifting", "mystery"]
-  const len_bkt = req.len_bkt ?? "B90_120"
-  const wx_bkt = req.body?.wx_bkt ?? "HOT"
+  const moods = req.moods
+  const len_bkt = req.len_bkt
+  const wx_bkt = req.wx_bkt
   const prompt_version = "v2"
 
   const inputParameters = {
@@ -150,7 +150,6 @@ Output JSON schema EXACTLY:
 
   try {
     res.json({
-      // prompt: prompt,
       inputParameters,
       data: dataOut
     })

@@ -38,10 +38,7 @@ function normalizeMoodsInput(input) {
 
 export function validateMoodBucket(req, _res, next) {
   try {
-    const raw = req.headers['x-moods']
-    // const raw = req.body?.moods
-
-    console.log("raw moods:", raw)
+    const raw = req.body?.moods
 
     const is_testing = parseBoolean(req.query.t)
 
@@ -71,7 +68,7 @@ export function validateMoodBucket(req, _res, next) {
       req = req || {}
       req.moods = unique.sort()
     } else {
-      req.moods = ["uplifting", "mystery"]
+      req.moods = req.body.moods
     }
 
     next()
@@ -109,7 +106,7 @@ export function validateLengthBucket(req, _res, next) {
       req = req || {}
       req.len_bkt = v
     } else {
-      req.len_bkt = "B90_120"
+      req.len_bkt = req.body.len_bkt
     }
 
     next()
@@ -136,7 +133,7 @@ export function validateWxBucket(req, _res, next) {
       req = req || {}
       req.wx_bkt = raw.trim().toUpperCase().replace(/\s+/g, " ")
     } else {
-      req.wx_bkt = "HOT"
+      req.wx_bkt = req.body.wx_bkt
     }
 
     next()
