@@ -5,10 +5,12 @@ import { sendError } from "../utils/sendError.js"
 import { validateWxAPIKey } from "../middleware/validator-keys.js"
 import { validateWeatherVars } from "../middleware/validator-wx.js"
 import { config } from "../config.js"
+import { dummyDataSets } from "../data/data-sets.js"
 
 const router = express.Router()
 
 router.post("/submit", async (req, res, next) => {
+  const apiHeader = config.api_key
 
   const local = parseBoolean(req.query.l)
   const is_testing = parseBoolean(req.query.t)
@@ -41,19 +43,18 @@ router.post("/submit", async (req, res, next) => {
 
       // get ai response
       const aiPayload = { wx_bkt: data.conditions, ...aiBase }
-      console.log("aiPayload:", aiPayload)
 
-      const aiResponse = await getAiSuggestions(aiPayload, is_testing, local)
-
-
+      let aiResponse
+      if (!is_testing) {
+        aiResponse = await getAiSuggestions(aiPayload, is_testing, local)
+      } else {
+        aiResponse = dummyDataSets[1]
+      }
       console.log("POST /read-submit")
-      res.status(200).json({
-        ok: true,
-        wxPayload: wxPayload,
-        // wxResponse: data.conditions,
-        aiPayload: aiPayload,
-        aiResponse: aiResponse,
-      })
+      res.status(200).json(
+        // aiResponse,
+        aiResponse.data,
+      )
     } else {
       res.status(200).json({
         ok: true,
@@ -83,12 +84,15 @@ async function getWxCondition(wxPayload, local = true) {
   return data
 }
 
-async function getAiSuggestions(aiPayload, t = true, local = true) {
-  const aiUrl = `https://api.clayaucoin.foo/api/v1/ai?t=${t}&l=${local}`
+async function getAiSuggestions(aiPayload, is_testing = true) {
+  const aiUrl = `https://api.clayaucoin.foo/api/v1/ai?t=${is_testing}`
   const apiHeader = config.ai_api_key
   const baseUrl = aiUrl
 
+
   console.log("baseUrl:", baseUrl)
+  console.log("aiPayload:", aiPayload)
+
   const response = await fetch(baseUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-api-key": apiHeader },

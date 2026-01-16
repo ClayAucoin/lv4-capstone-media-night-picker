@@ -1,9 +1,12 @@
 // src/App.jsx
 
 import "./App.css"
-import FormFields from "./Components/FormFields"
+import { Routes, Route, Navigate } from "react-router-dom"
+import { AuthProvider } from "./context/AuthContext.jsx"
+import FormFields from "./components/FormFields"
+import Display from "./components/Display"
 
-function Page() {
+function App() {
   return (
     <>
       <div className="container py-3" style={{ maxWidth: 1000 }}>
@@ -11,11 +14,20 @@ function Page() {
         <div className="card border">
           <div className="card-body">
             <h5 className="card-title">Movie Night Planner</h5>
-            <FormFields />
+            <AuthProvider>
+              <Routes>
+                {/* <Route path="/" element={<Navigate to="/login" replace />} /> */}
+                <Route path="/form/" element={<FormFields />} />
+
+                <Route path="/display/" element={<Display />} />
+
+                <Route path="*" element={<FormFields />} />
+              </Routes>
+            </AuthProvider>
           </div>
         </div>
       </div>
     </>
   )
 }
-export default Page
+export default App

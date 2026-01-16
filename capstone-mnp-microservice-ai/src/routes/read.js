@@ -17,6 +17,7 @@ const router = express.Router()
 router.post('/', validateAPIKey, validateMoodBucket, validateLengthBucket, validateWxBucket, async (req, res, next) => {
   console.log('POST /')
   const is_testing = parseBoolean(req.query.t)
+  const local = parseBoolean(req.query.l)
 
   const count = 5
   const moods = req.moods
@@ -42,7 +43,6 @@ Return STRICT JSON only.
 
 Allowed enums:
 - length_bucket: ["LT_90","B90_120","B120_150","GT_150"]
-- weather_bucket: ["CLEAR","RAIN","COLD","HOT","STORM"]
 - moods: ["chill","funny","intense","romantic","family","uplifting","mystery","action"]
 
 Definitions:
@@ -50,13 +50,6 @@ Definitions:
 - B90_120 = runtime between 90 and 120 minutes (inclusive)
 - B120_150 = runtime between 120 and 150 minutes (inclusive)
 - GT_150 = runtime greater than 150 minutes
-
-Weather vibe guide (use ONLY the enum values above):
-- CLEAR: bright, upbeat, easy watch
-- RAIN: cozy, indoors, comfort
-- COLD: warm, comforting, low-stress
-- HOT: light, fun, breezy
-- STORM: tense, focused, high-energy (still respect the mood list)
 
 Integration note:
 - The system will try to resolve posters/slugs using Trakt.tv (VIP available).
@@ -66,7 +59,7 @@ Integration note:
 Input (user request):
 - requested_moods: ${JSON.stringify(moods)}   (must be from allowed moods; lowercase)
 - length_requirement: ${len_bkt}  (use this exact enum in output)
-- weather_context: ${wx_bkt}      (use this exact enum in output)
+- weather_context: ${wx_bkt}
 - count: ${count}
 
 Rules:
@@ -87,8 +80,8 @@ Rules:
   - "weather_bucket" exactly as "${wx_bkt}"
 - The "moods" array must contain 1 or 2 values ONLY from requested_moods (no other moods).
 - "reason" must be 1-2 practical sentences connecting mood + weather vibe + runtime.
-- Do NOT output any enum value outside the allowed lists. If you cannot comply, return:
-{"prompt_version":"v2","recommendations":[{"status": "can't comply"}]}
+- Do NOT output any enum value outside the allowed lists. If you cannot comply, return this with a reason:
+{"prompt_version":"${prompt_version}","recommendations":[{"status": "can't comply", "reason": "Reason you can't comply."}]}
 
 Self-check before output:
 - length_bucket is exactly "${len_bkt}" for every item
@@ -101,7 +94,7 @@ Self-check before output:
 
 Output JSON schema EXACTLY:
 {
-  "prompt_version": ${prompt_version},
+  "prompt_version": "${prompt_version}",
   "recommendations": [
     {
       "title": "string",
@@ -126,7 +119,8 @@ Output JSON schema EXACTLY:
     });
 
     const chatCompletion = await client.chat.completions.create({
-      model: "openai/gpt-oss-20b:groq",
+      // model: "openai/gpt-oss-20b:groq",
+      model: "openai/gpt-oss-120b:fireworks-ai",
       messages: [
         {
           role: "user",

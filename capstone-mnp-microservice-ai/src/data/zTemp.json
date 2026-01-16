@@ -1,0 +1,23 @@
+{
+  "ok": true,
+  "testing": false,
+  "inputParameters": {
+    "count": 5,
+    "len_bkt": "B120_150",
+    "wx_bkt": "PARTIALLY CLOUDY",
+    "prompt_version": "v2",
+    "moods": [
+      "action",
+      "intense"
+    ]
+  },
+  "data": {
+    "prompt_version": "v2",
+    "recommendations": [
+      {
+        "status": "can't comply",
+        "reason": "The requested weather_context 'PARTIALLY CLOUDY' is not a valid enum value for weather_bucket. Valid options are CLEAR, RAIN, COLD, HOT, STORM."
+      }
+    ]
+  }
+}

@@ -5,6 +5,8 @@ const SET_TABLE = "lv4_cap_recommendation_sets"
 const WX_CONDITION = "Rain, Partially cloudy"
 
 import { useState, useEffect, useCallback } from "react"
+import { useNavigate, Link, Navigate } from "react-router-dom"
+import { useAuth } from "../context/AuthContext"
 import supabase from "../utils/supabase.js"
 
 const MOODS = [
@@ -35,7 +37,9 @@ function todayLocalYYYYMMDD() {
 
 export default function FormFields() {
   const [sets, setSets] = useState([])
-  const [result, setResult] = useState([])
+  const { results, setResults } = useAuth()
+
+  const navigate = useNavigate()
 
   // get sets from table
   const getSets = useCallback(async () => {
@@ -96,7 +100,11 @@ export default function FormFields() {
     }
     console.log("payload:", payload)
 
-    const baseUrl = "http://localhost:3000/api/v1/submit?t=false&l=true"
+    const is_testing = true
+    const local = false
+    const baseUrl = `http://localhost:3000/api/v1/submit?t=${is_testing}&l=${local}`
+
+    console.log("baseUrl:", baseUrl)
 
     const response = await fetch(baseUrl, {
       method: "POST",
@@ -119,8 +127,10 @@ export default function FormFields() {
       throw new Error(data?.error?.message ?? "Request failed")
     }
 
-    setResult(data)
+    setResults(data)
     setSets(await getSets())
+
+    navigate("/display")
   }
 
   return (
@@ -263,9 +273,24 @@ export default function FormFields() {
                 )}
               </small>
             </pre>
+            {/* <div>
+              <ul>
+                {results.length === 0 ? (
+                  <p>No sets yet.</p>
+                ) : (
+                  results.map((result) => (
+                    <li key={result.id} className="json-display">
+                      {normalizeMoods(result.moods)}, {result.length_bucket},{" "}
+                      {result.weather_bucket}
+                    </li>
+                  ))
+                )}
+              </ul>
+            </div> */}
+
             <div>
               <pre className="json-display">
-                {result ? JSON.stringify(result, null, 2) : ""}
+                {results ? JSON.stringify(results, null, 2) : ""}
               </pre>
             </div>
           </div>

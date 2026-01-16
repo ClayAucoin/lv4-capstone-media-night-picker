@@ -1,88 +1,89 @@
 ## OpenAI fectch
 
 ```js
-// microservice/src/routes/ai.js
-import express from "express"
-import OpenAI from "openai"
+You are a movie recommendation engine.
 
-const router = express.Router()
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+Return STRICT JSON only.
+- No markdown
+- No backticks
+- No commentary
+- No extra keys
 
-router.post("/api/v1/ai/recommendations", async (req, res, next) => {
-  try {
-    const {
-      moods,
-      length_bucket,
-      weather_bucket,
-      prompt_version = "v1",
-      variant = "default",
-      count = 8,
-    } = req.body
+Allowed enums:
+- length_bucket: ["LT_90","B90_120","B120_150","GT_150"]
+- weather_bucket: ["CLEAR","RAIN","COLD","HOT","STORM"]
+- moods: ["chill","funny","intense","romantic","family","uplifting","mystery","action"]
 
-    // Build prompt (keep it deterministic)
-    const prompt = `
-Generate ${count} movie-night recommendations.
+Definitions:
+- LT_90 = runtime under 90 minutes
+- B90_120 = runtime between 90 and 120 minutes (inclusive)
+- B120_150 = runtime between 120 and 150 minutes (inclusive)
+- GT_150 = runtime greater than 150 minutes
 
-Preferences:
-- moods: ${JSON.stringify(moods)}
-- length_bucket: ${length_bucket}
-- weather_bucket: ${weather_bucket}
+Weather vibe guide (use ONLY the enum values above):
+- CLEAR: bright, upbeat, easy watch
+- RAIN: cozy, indoors, comfort
+- COLD: warm, comforting, low-stress
+- HOT: light, fun, breezy
+- STORM: tense, focused, high-energy (still respect the mood list)
 
-Return STRICT JSON only with this shape:
+Integration note:
+- The system will try to resolve posters/slugs using Trakt.tv (VIP available).
+- Therefore, if you know the Trakt slug for a movie, include it.
+- If you do not know with high confidence, leave those fields blank as specified in the schema.
+
+Input (user request):
+- requested_moods: ${JSON.stringify(moods)}   (must be from allowed moods; lowercase)
+- length_requirement: ${len_bkt}  (use this exact enum in output)
+- weather_context: ${wx_bkt}      (use this exact enum in output)
+- count: ${count}
+
+Rules:
+- Return exactly ${count} recommendations.
+- Prefer widely-known real movies. If unsure, pick mainstream titles. Do not invent runtimes or plot facts.
+- If you are unsure a movie is real, do not include it.
+- If a movie is commonly confused with remakes or same-title movies, prefer the most well-known version and ensure "year" matches that version.
+- Add IDs only if confident:
+  - trakt_slug may be provided if you are confident in the exact Trakt slug, otherwise null.
+  - tmdb_id may be provided if you are confident it is correct, otherwise 0.
+  - imdb_id may be provided if you are confident it is correct, otherwise "".
+  - Prefer providing trakt_slug over tmdb_id/imdb_id. If unsure about tmdb/imdb, leave them blank; Trakt resolution will handle it.
+- Never guess IDs. If unsure, leave them blank as specified above.
+- imdb_id must be "" or match ^tt\\d{7,8}$.
+- Always include "year" to help downstream ID resolution.
+- Every recommendation MUST set:
+  - "length_bucket" exactly as "${len_bkt}"
+  - "weather_bucket" exactly as "${wx_bkt}"
+- The "moods" array must contain 1 or 2 values ONLY from requested_moods (no other moods).
+- "reason" must be 1-2 practical sentences connecting mood + weather vibe + runtime.
+- Do NOT output any enum value outside the allowed lists. If you cannot comply, return this with a reason:
+{"prompt_version":"${prompt_version}","recommendations":[{"status": "can't comply", "reason": "Reason you can't comply."}]}
+
+Self-check before output:
+- length_bucket is exactly "${len_bkt}" for every item
+- weather_bucket is exactly "${wx_bkt}" for every item
+- moods are only from requested_moods
+- trakt_type is "movie" for every item
+- trakt_slug is either a string you are confident in or null
+- tmdb_id is either a known correct integer or 0
+- imdb_id is "" or matches ^tt\\d{7,8}$
+
+Output JSON schema EXACTLY:
 {
   "prompt_version": "${prompt_version}",
-  "variant": "${variant}",
   "recommendations": [
-    { "title": "string", "year": 2000, "reason": "string" }
+    {
+      "title": "string",
+      "year": 2000,
+      "length_bucket": "LT_90",
+      "moods": ["chill"],
+      "weather_bucket": "RAIN",
+      "reason": "string",
+      "trakt_type": "movie",
+      "trakt_slug": null,
+      "tmdb_id": 0,
+      "imdb_id": ""
+    }
   ]
 }
-No markdown. No extra keys.
-`.trim()
-
-    const response = await client.responses.create({
-      model: process.env.OPENAI_MODEL || "gpt-4o-mini",
-      input: prompt,
-    })
-
-    // The SDK returns a structured object; easiest is to extract text and JSON.parse it.
-    // In production you’d add more guardrails, but this is capstone-appropriate.
-    const text = response.output_text
-    const data = JSON.parse(text)
-
-    return res.json(data)
-  } catch (err) {
-    return next(err)
-  }
-})
-
-export default router
 ```
-
-Generate movie night recommendations.
-
-User preferences:
-
-- moods: ["chill", "funny"]
-- length_bucket: "LT_90" (under 90 minutes)
-- weather_bucket: "RAIN"
-- date_local: "2026-01-03" (for flavor only; do not mention forecasts)
-  Rules:
-- Return exactly 5 recommendations.
-- Each recommendation must match the length_bucket.
-- Each recommendation must fit the weather_bucket vibe.
-- Keep reasons short (1-2 sentences), practical, not cheesy.
-- Output MUST be valid JSON with this exact shape:
-
-{
-"prompt_version": "v1",
-"recommendations": [
-{
-"title": "string",
-"year": 2000,
-"length_bucket": "LT_90",
-"moods": ["chill", "funny"],
-"weather_bucket": "RAIN",
-"reason": "string"
-}
-]
-}
