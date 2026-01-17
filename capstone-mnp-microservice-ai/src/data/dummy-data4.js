@@ -1,6 +1,17 @@
 // src/data/dummy-data4.js
 
 const dummyData4 = {
+  "ok": true,
+  "testing": true,
+  "inputParameters": {
+    "count": 5,
+    "len_bkt": "B120_150",
+    "wx_bkt": "Partially cloudy",
+    "prompt_version": "v2",
+    "moods": [
+      "action"
+    ]
+  },
   "data": {
     "dummy_data": "set4",
     "prompt_version": "v2",

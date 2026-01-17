@@ -45,7 +45,7 @@ router.post("/wx", validateWxAPIKey, validateWeatherVars, async (req, res, next)
       conditions: data.conditions
     })
   } catch (err) {
-    next(sendError(500, "Internal server error", "INTERNAL_ERROR"))
+    next(sendError(500, "Internal server error", "INTERNAL_ERROR_BKEND_WX"))
   }
 })
 

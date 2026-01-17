@@ -16,6 +16,6 @@ export const dummyDataSets = [
   dummyData4,
   dummyData5,
   dummyData6,
-  dummyData7,
-  dummyData8
 ]
+// dummyData7,
+// dummyData8

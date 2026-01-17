@@ -150,7 +150,7 @@ Output JSON schema EXACTLY:
     })
   } catch (err) {
     console.error(err)
-    return next(sendError(500, "Internal server error", "INTERNAL_ERROR", {
+    return next(sendError(500, "Internal server error", "INTERNAL_ERROR_MS_AI", {
       underlying: err.message
     }))
   }

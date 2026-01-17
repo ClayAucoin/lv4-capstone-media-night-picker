@@ -52,7 +52,7 @@ router.post("/ai", validateAIAPIKey, validateMoodBucket, validateLengthBucket, v
       data: data,
     })
   } catch (err) {
-    next(sendError(500, "Internal server error", "INTERNAL_ERROR"))
+    next(sendError(500, "Internal server error", "INTERNAL_ERROR_BKEND_AI"))
   }
 })
 

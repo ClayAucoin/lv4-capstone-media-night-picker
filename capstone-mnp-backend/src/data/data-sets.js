@@ -8,8 +8,8 @@ import dummyData5 from "./dummy-data5.js"
 
 export const dummyDataSets = [
   dummyData1,
-  dummyData2,
-  dummyData3,
-  dummyData4,
-  dummyData5
+  // dummyData2,
+  // dummyData3,
+  // dummyData4,
+  // dummyData5
 ]

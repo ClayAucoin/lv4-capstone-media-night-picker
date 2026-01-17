@@ -21,7 +21,6 @@ router.post("/submit", async (req, res, next) => {
     date,
     zip,
     len_bkt,
-    // wx_bkt,
     moods
   }
 
@@ -43,16 +42,11 @@ router.post("/submit", async (req, res, next) => {
 
       // get ai response
       const aiPayload = { wx_bkt: data.conditions, ...aiBase }
+      const aiResponse = await getAiSuggestions(aiPayload, is_testing, local)
+      // console.log("aiResponse:", aiResponse)
 
-      let aiResponse
-      if (!is_testing) {
-        aiResponse = await getAiSuggestions(aiPayload, is_testing, local)
-      } else {
-        aiResponse = dummyDataSets[1]
-      }
       console.log("POST /read-submit")
       res.status(200).json(
-        // aiResponse,
         aiResponse.data,
       )
     } else {
@@ -63,7 +57,7 @@ router.post("/submit", async (req, res, next) => {
       })
     }
   } catch (err) {
-    next(sendError(500, "Internal server error", "INTERNAL_ERROR"))
+    next(sendError(500, "Internal server error", "INTERNAL_ERROR_BKEND_SBMT"))
   }
 })
 

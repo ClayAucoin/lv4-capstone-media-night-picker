@@ -65,7 +65,7 @@ router.post('/', validateAPIKey, validateWeatherVars, async (req, res, next) => 
     })
   } catch (err) {
     console.error(err)
-    return next(sendError(500, "Internal server error", "INTERNAL_ERROR", {
+    return next(sendError(500, "Internal server error", "INTERNAL_ERROR_MS_WX", {
       underlying: err.message
     }))
   }

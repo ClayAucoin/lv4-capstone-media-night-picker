@@ -2,6 +2,16 @@
 
 - validate input
 
+- Loading...
+
+  - Have a loading spinner and dim background while loading
+
+- Add results to Supabase
+
+  - how does adding multiple rows to Supabase work
+
+- Check if signature exists before hitting AI
+
 ### INSERT new set
 
 <!--

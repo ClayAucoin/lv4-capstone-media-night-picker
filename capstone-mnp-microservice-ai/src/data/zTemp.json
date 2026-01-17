@@ -4,19 +4,87 @@
   "inputParameters": {
     "count": 5,
     "len_bkt": "B120_150",
-    "wx_bkt": "PARTIALLY CLOUDY",
+    "wx_bkt": "COLD",
     "prompt_version": "v2",
     "moods": [
-      "action",
-      "intense"
+      "chill",
+      "romantic"
     ]
   },
   "data": {
     "prompt_version": "v2",
     "recommendations": [
       {
-        "status": "can't comply",
-        "reason": "The requested weather_context 'PARTIALLY CLOUDY' is not a valid enum value for weather_bucket. Valid options are CLEAR, RAIN, COLD, HOT, STORM."
+        "title": "Pride & Prejudice",
+        "year": 2005,
+        "length_bucket": "B120_150",
+        "moods": [
+          "romantic"
+        ],
+        "weather_bucket": "COLD",
+        "reason": "A sweeping romance that feels cozy on cold evenings, with a runtime that allows you to settle in and enjoy the period atmosphere.",
+        "trakt_type": "movie",
+        "trakt_slug": "pride-and-prejudice-2005",
+        "tmdb_id": 0,
+        "imdb_id": ""
+      },
+      {
+        "title": "The Holiday",
+        "year": 2006,
+        "length_bucket": "B120_150",
+        "moods": [
+          "romantic",
+          "chill"
+        ],
+        "weather_bucket": "COLD",
+        "reason": "A light‑hearted romantic comedy perfect for snuggling under a blanket while the weather stays chilly, with plenty of time to unwind.",
+        "trakt_type": "movie",
+        "trakt_slug": "the-holiday",
+        "tmdb_id": 0,
+        "imdb_id": ""
+      },
+      {
+        "title": "Love Actually",
+        "year": 2003,
+        "length_bucket": "B120_150",
+        "moods": [
+          "romantic"
+        ],
+        "weather_bucket": "COLD",
+        "reason": "Multiple interwoven love stories give a warm feeling against a cold backdrop, and the generous runtime lets each tale breathe.",
+        "trakt_type": "movie",
+        "trakt_slug": "love-actually",
+        "tmdb_id": 0,
+        "imdb_id": ""
+      },
+      {
+        "title": "Silver Linings Playbook",
+        "year": 2012,
+        "length_bucket": "B120_150",
+        "moods": [
+          "chill"
+        ],
+        "weather_bucket": "COLD",
+        "reason": "A relaxed, feel‑good drama that matches the quiet of a cold night, offering enough length to get fully absorbed in the characters.",
+        "trakt_type": "movie",
+        "trakt_slug": "silver-linings-playbook",
+        "tmdb_id": 0,
+        "imdb_id": ""
+      },
+      {
+        "title": "La La Land",
+        "year": 2016,
+        "length_bucket": "B120_150",
+        "moods": [
+          "romantic",
+          "chill"
+        ],
+        "weather_bucket": "COLD",
+        "reason": "A dreamy musical romance that feels especially soothing when it’s cold outside, with a runtime that lets the melody linger.",
+        "trakt_type": "movie",
+        "trakt_slug": "la-la-land",
+        "tmdb_id": 0,
+        "imdb_id": ""
       }
     ]
   }

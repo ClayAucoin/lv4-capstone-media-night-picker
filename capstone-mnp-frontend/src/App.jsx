@@ -2,7 +2,7 @@
 
 import "./App.css"
 import { Routes, Route, Navigate } from "react-router-dom"
-import { AuthProvider } from "./context/AuthContext.jsx"
+import { AuthProvider } from "./context/AuthProvider"
 import FormFields from "./components/FormFields"
 import Display from "./components/Display"
 

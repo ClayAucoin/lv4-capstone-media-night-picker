@@ -1,12 +1,11 @@
 // src/Components/FormFields.jsx
 
-const IS_TESTING = true
 const SET_TABLE = "lv4_cap_recommendation_sets"
 const WX_CONDITION = "Rain, Partially cloudy"
 
 import { useState, useEffect, useCallback } from "react"
 import { useNavigate, Link, Navigate } from "react-router-dom"
-import { useAuth } from "../context/AuthContext"
+import { useAuth } from "../context/useAuth.js"
 import supabase from "../utils/supabase.js"
 
 const MOODS = [
@@ -37,7 +36,8 @@ function todayLocalYYYYMMDD() {
 
 export default function FormFields() {
   const [sets, setSets] = useState([])
-  const { results, setResults } = useAuth()
+  const { results, setResults, isTesting, formTesting } = useAuth()
+  // const { results, setResults, isLoading, setIsLoading } = useAuth()
 
   const navigate = useNavigate()
 
@@ -68,7 +68,7 @@ export default function FormFields() {
   }, [getSets])
 
   // zip
-  const [zip, setZip] = useState(IS_TESTING ? "70003" : "")
+  const [zip, setZip] = useState(formTesting ? "70003" : "")
   const zipOk = /^\d{5}$/.test(zip)
 
   // date
@@ -90,6 +90,8 @@ export default function FormFields() {
   const [length, setLength] = useState("")
 
   async function handleSubmit() {
+    // setIsLoading(true)
+
     // get values from form
     const payload = {
       pv: "v1",
@@ -98,13 +100,10 @@ export default function FormFields() {
       len_bkt: length,
       moods: selectedMoods,
     }
-    console.log("payload:", payload)
+    // console.log("payload:", payload)
 
-    const is_testing = true
     const local = false
-    const baseUrl = `http://localhost:3000/api/v1/submit?t=${is_testing}&l=${local}`
-
-    console.log("baseUrl:", baseUrl)
+    const baseUrl = `http://localhost:3000/api/v1/submit?t=${isTesting}&l=${local}`
 
     const response = await fetch(baseUrl, {
       method: "POST",
@@ -116,6 +115,7 @@ export default function FormFields() {
     })
 
     const text = await response.text()
+
     let data
     try {
       data = JSON.parse(text)
@@ -273,20 +273,6 @@ export default function FormFields() {
                 )}
               </small>
             </pre>
-            {/* <div>
-              <ul>
-                {results.length === 0 ? (
-                  <p>No sets yet.</p>
-                ) : (
-                  results.map((result) => (
-                    <li key={result.id} className="json-display">
-                      {normalizeMoods(result.moods)}, {result.length_bucket},{" "}
-                      {result.weather_bucket}
-                    </li>
-                  ))
-                )}
-              </ul>
-            </div> */}
 
             <div>
               <pre className="json-display">
