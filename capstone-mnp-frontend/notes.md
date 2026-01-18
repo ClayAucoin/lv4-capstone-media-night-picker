@@ -2,16 +2,6 @@
 
 - validate input
 
-- Loading...
-
-  - Have a loading spinner and dim background while loading
-
-- Add results to Supabase
-
-  - how does adding multiple rows to Supabase work
-
-- Check if signature exists before hitting AI
-
 ### Stacks
 
 | Stacks    | Port | External URL           |
@@ -20,8 +10,6 @@
 | backend   | 3000 | api.clayaucoin.foo     |
 | lv4cap.ai | 3105 | lv4.ai.clayaucoin.foo  |
 | weather   | 3100 | weather.clayaucoin.foo |
-
-api9 > mnp
 
 ### INSERT new set
 
