@@ -121,7 +121,8 @@ export default function FormFields() {
       }
 
       const local = false
-      const baseUrl = `http://localhost:3000/api/v1/submit?t=${isTesting}&l=${local}`
+      // const baseUrl = `http://localhost:3000/api/v1/submit?t=${isTesting}&l=${local}`
+      const baseUrl = `https://api.clayaucoin.foo/api/v1/submit?t=${isTesting}&l=${local}`
 
       const response = await fetch(baseUrl, {
         method: "POST",
