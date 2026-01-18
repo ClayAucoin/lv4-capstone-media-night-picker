@@ -1,11 +1,11 @@
 // src/Components/FormFields.jsx
 
-const IS_TESTING = true
 const SET_TABLE = "lv4_cap_recommendation_sets"
 const WX_CONDITION = "Rain, Partially cloudy"
 
 import { useState, useEffect, useCallback } from "react"
 import supabase from "../utils/supabase.js"
+import { useAuth } from "../context/useAuth.js"
 
 const MOODS = [
   { value: "chill", label: "Chill" },
@@ -34,6 +34,7 @@ function todayLocalYYYYMMDD() {
 }
 
 export default function FormFields() {
+  const { formTesting } = useAuth()
   const [sets, setSets] = useState([])
 
   // get sets from table
@@ -63,7 +64,7 @@ export default function FormFields() {
   }, [getSets])
 
   // zip
-  const [zip, setZip] = useState(IS_TESTING ? "70003" : "")
+  const [zip, setZip] = useState(formTesting ? "70003" : "")
   const zipOk = /^\d{5}$/.test(zip)
 
   // date
@@ -178,7 +179,7 @@ export default function FormFields() {
   }
 
   function normalizeCondition(string) {
-    const wx_bucket = (string ?? "").trim().toUpperCase().replace(/\s+/g, " ")
+    const wx_bucket = (string ?? "").trim().toUpperCase().replace(/\s+/g, "_")
 
     return wx_bucket
   }

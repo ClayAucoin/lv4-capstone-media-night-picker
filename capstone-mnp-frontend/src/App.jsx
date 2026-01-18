@@ -13,7 +13,7 @@ function App() {
         {/* <div className="card border" style={{ width: "28rem" }}> */}
         <div className="card border">
           <div className="card-body">
-            <h5 className="card-title">Movie Night Planner</h5>
+            <h3 className="card-title text-center">Movie Night Planner</h3>
             <AuthProvider>
               <Routes>
                 {/* <Route path="/" element={<Navigate to="/login" replace />} /> */}

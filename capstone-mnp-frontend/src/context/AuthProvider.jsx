@@ -6,6 +6,7 @@ import { AuthContext } from "./authContext.js"
 export function AuthProvider({ children }) {
   const [results, setResults] = useState([])
   const [isLoading, setIsLoading] = useState(false)
+  const [payload, setPayload] = useState([])
 
   const isTesting = import.meta.env.VITE_IS_TESTING === "true"
   const formTesting = import.meta.env.VITE_FORM_TESTING === "true"
@@ -19,6 +20,8 @@ export function AuthProvider({ children }) {
     setIsLoading,
     isTesting,
     formTesting,
+    payload,
+    setPayload,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

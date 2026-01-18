@@ -36,10 +36,14 @@ function todayLocalYYYYMMDD() {
 
 export default function FormFields() {
   const [sets, setSets] = useState([])
-  const { results, setResults, isTesting, formTesting } = useAuth()
+  const { results, setResults, isTesting, formTesting, payload, setPayload } =
+    useAuth()
   // const { results, setResults, isLoading, setIsLoading } = useAuth()
 
   const navigate = useNavigate()
+
+  // loading state for spinner + disabling
+  const [isLoading, setIsLoading] = useState(false)
 
   // get sets from table
   const getSets = useCallback(async () => {
@@ -69,7 +73,7 @@ export default function FormFields() {
 
   // zip
   const [zip, setZip] = useState(formTesting ? "70003" : "")
-  const zipOk = /^\d{5}$/.test(zip)
+  const zipOk = /^\d{5}$/.test(zip.trim())
 
   // date
   const today = todayLocalYYYYMMDD()
@@ -89,52 +93,86 @@ export default function FormFields() {
   // length
   const [length, setLength] = useState("")
 
+  // disable Get Movies until all required fields are present
+  const moodsOk = selectedMoods.length > 0
+  const lengthOk = length.trim().length > 0
+  const dateOk = !!date
+  const canSubmit = zipOk && dateOk && moodsOk && lengthOk
+  const submitDisabled = !canSubmit || isLoading
+
   async function handleSubmit() {
-    // setIsLoading(true)
+    if (submitDisabled) return
 
-    // get values from form
-    const payload = {
-      pv: "v1",
-      zip: String(zip).trim(),
-      date: date,
-      len_bkt: length,
-      moods: selectedMoods,
-    }
-    // console.log("payload:", payload)
+    setIsLoading(true)
 
-    const local = false
-    const baseUrl = `http://localhost:3000/api/v1/submit?t=${isTesting}&l=${local}`
-
-    const response = await fetch(baseUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": import.meta.env.VITE_API_KEY,
-      },
-      body: JSON.stringify(payload),
-    })
-
-    const text = await response.text()
-
-    let data
     try {
-      data = JSON.parse(text)
-    } catch {
-      throw new Error("Backend returned non-JSON")
+      // get values from form
+      setPayload({
+        pv: "v2",
+        zip: String(zip).trim(),
+        date: date,
+        len_bkt: length,
+        moods: selectedMoods,
+      })
+      // console.log("payload:", payload)
+
+      const local = false
+      const baseUrl = `http://localhost:3000/api/v1/submit?t=${isTesting}&l=${local}`
+
+      const response = await fetch(baseUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": import.meta.env.VITE_API_KEY,
+        },
+        body: JSON.stringify(payload),
+      })
+
+      const text = await response.text()
+
+      let data
+      try {
+        data = JSON.parse(text)
+      } catch {
+        throw new Error("Backend returned non-JSON")
+      }
+
+      if (!response.ok) {
+        throw new Error(data?.error?.message ?? "Request failed")
+      }
+
+      setResults(data)
+      setSets(await getSets())
+
+      navigate("/display")
+    } finally {
+      // If you navigate away, this component typically unmounts quickly anyway,
+      // but leaving this here keeps state consistent if navigation ever changes.
+      setIsLoading(false)
     }
-
-    if (!response.ok) {
-      throw new Error(data?.error?.message ?? "Request failed")
-    }
-
-    setResults(data)
-    setSets(await getSets())
-
-    navigate("/display")
   }
 
   return (
     <>
+      {/* Spinner overlay (Bootstrap) */}
+      {isLoading && (
+        <div
+          className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+          style={{
+            background: "rgba(0,0,0,0.35)",
+            zIndex: 2000,
+          }}
+        >
+          <div
+            className="bg-white rounded p-3 d-flex flex-column align-items-center"
+            style={{ minWidth: 220 }}
+          >
+            <div className="spinner-border" role="status" aria-hidden="true" />
+            <div className="mt-2 small">Getting movies...</div>
+          </div>
+        </div>
+      )}
+
       <div className="container py-3" style={{ maxWidth: 1000 }}>
         <div className="row">
           <div className="col-8">
@@ -154,6 +192,7 @@ export default function FormFields() {
                 }`}
                 placeholder="ZIP code (e.g., 70112)"
                 value={zip}
+                disabled={isLoading}
                 onChange={(e) => {
                   const digitsOnly = e.target.value
                     .replace(/\D/g, "")
@@ -187,7 +226,7 @@ export default function FormFields() {
                 style={{ cursor: zipOk ? "pointer" : "not-allowed" }}
                 value={date}
                 min={today}
-                disabled={dateDisabled}
+                disabled={dateDisabled || isLoading}
                 onChange={(e) => setDate(e.target.value)}
               />
 
@@ -217,6 +256,7 @@ export default function FormFields() {
                         }`}
                         onClick={() => toggleMood(m.value)}
                         aria-pressed={active}
+                        disabled={isLoading}
                       >
                         {m.label}
                       </button>
@@ -235,8 +275,10 @@ export default function FormFields() {
 
               <select
                 id="length"
+                name="length"
                 className="form-select form-select-sm"
                 value={length}
+                disabled={isLoading}
                 onChange={(e) => setLength(e.target.value)}
               >
                 <option value="">Any length</option>
@@ -258,9 +300,28 @@ export default function FormFields() {
                 className="btn btn-primary btn-sm"
                 type="button"
                 onClick={handleSubmit}
+                disabled={submitDisabled}
               >
-                Get Movies
+                {isLoading ? (
+                  <>
+                    <span
+                      className="spinner-border spinner-border-sm me-2"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                    Getting Movies...
+                  </>
+                ) : (
+                  "Get Movies"
+                )}
               </button>
+
+              {/* Optional tiny hint when disabled because form incomplete */}
+              {!isLoading && !canSubmit && (
+                <div className="form-text mt-1">
+                  Fill ZIP, date, at least one mood, and length to enable.
+                </div>
+              )}
             </div>
 
             {/* json output */}

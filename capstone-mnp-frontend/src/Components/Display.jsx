@@ -3,40 +3,59 @@
 import { useEffect, useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import { useAuth } from "../context/useAuth.js"
-import { posterFromTraktMovieSlug } from "../utils/getPoster"
-// import supabase from "../utils/supabase.js"
+import { posterFromTraktMovieSlug } from "../utils/getPoster.js"
+
+function posterKeyFor(r) {
+  const slug = r?.trakt_slug
+  const year = r?.year
+
+  if (!slug) return null
+
+  // If it already ends with -YYYY, keep it
+  if (/-\d{4}$/.test(slug)) return slug
+
+  // Otherwise append year if present
+  return year ? `${slug}-${year}` : slug
+}
 
 export default function Display() {
-  const { results, isTesting } = useAuth()
+  // const { results, isTesting } = useAuth()
+  const { results, payload } = useAuth()
   const navigate = useNavigate()
   const [postersByImdb, setPostersByImdb] = useState({})
 
   const resultDisplay = results?.data?.recommendations
-  if (results?.length === 0 || resultDisplay?.length === 0) navigate("/form")
 
   useEffect(() => {
-    if (!resultDisplay?.length) {
-      navigate("/form")
+    if (!Array.isArray(resultDisplay) || resultDisplay.length === 0) {
+      navigate("/form", { replace: true })
       return
     }
+
     let cancelled = false
 
     ;(async () => {
-      // setIsLoading(true)
       try {
-        const entries = await Promise.all(
+        const settled = await Promise.allSettled(
           resultDisplay.map(async (r) => {
-            const traktId = `${r.trakt_slug}-${r.year}`
-            const url = await posterFromTraktMovieSlug(traktId)
-            return [r.imdb_id, url]
+            const key = posterKeyFor(r)
+            if (!key) return null // skip null trakt_slug
+
+            const url = await posterFromTraktMovieSlug(key)
+            return [key, url ?? "/poster-fallback.png"]
           })
         )
+
+        const entries = settled
+          .filter((x) => x.status === "fulfilled" && x.value)
+          .map((x) => x.value)
 
         if (!cancelled) {
           setPostersByImdb(Object.fromEntries(entries))
         }
-      } finally {
-        // if (!cancelled) setIsLoading(false)
+      } catch (e) {
+        // last-resort catch (should be rare with allSettled)
+        console.error(e)
       }
     })()
 
@@ -48,21 +67,26 @@ export default function Display() {
   return (
     <div>
       <div className="row">
-        <div className="col">
-          <Link to="/form">Search Again</Link>
+        <div className="col-12 text-center">
+          <h4>
+            <Link to="/form">Search Again</Link>
+          </h4>
         </div>
       </div>
       <div>
         <ul className="list-group">
           {resultDisplay?.map((result) => {
-            // const traktId = `${result.trakt_slug}-${result.year}`
-            const posterUrl =
-              postersByImdb[result.imdb_id] || "/poster-fallback.png"
+            const key = posterKeyFor(result) || `${result.title}-${result.year}` // fallback for rare nulls
+            const posterUrl = postersByImdb[key] || "/poster-fallback.png"
 
             return (
-              <li key={result.imdb_id} className="list-group-item json-display">
-                <div className="row mb-2">
-                  <div className="col-2 d-flex justify-content-center align-items-center">
+              <li
+                key={key}
+                className="list-group-item list-group-item-light json-display"
+              >
+                {" "}
+                <div className="row mb-2 border border-0">
+                  <div className="col-1 d-flex justify-content-center align-items-center">
                     <img
                       className="rounded poster"
                       src={posterUrl}
@@ -70,14 +94,13 @@ export default function Display() {
                     />
                   </div>
 
-                  <div className="col-10">
-                    {/* <small>
-                      {`posterUrl: ${posterUrl}`}
-                      <br />
-                      {`traktId: ${traktId}`}
-                      <br />
-                    </small> */}
-                    {result.title} ({result.year})
+                  <div className="col-11">
+                    <h1 className="fs-5 fw-semibold inline-block">
+                      {result.title}
+                    </h1>
+                    <h3 className="fs-5 fw-semibold text-muted inline-block">
+                      <small> ({result.year})</small>
+                    </h3>
                     <br />
                     <ul>
                       <li>{result.reason}</li>
@@ -89,13 +112,19 @@ export default function Display() {
           })}
         </ul>
       </div>
-      {isTesting && (
-        <div>
-          <pre className="signature-display">
-            {resultDisplay ? JSON.stringify(resultDisplay, null, 2) : ""}
-          </pre>
-        </div>
-      )}
+      {/* {isTesting && ( */}
+      <div>
+        <h6>
+          <small>payload</small>
+        </h6>
+        <pre className="signature-display">
+          {payload ? JSON.stringify(payload, null, 2) : ""}
+        </pre>
+        <pre className="signature-display">
+          {resultDisplay ? JSON.stringify(resultDisplay, null, 2) : ""}
+        </pre>
+      </div>
+      {/* )} */}
     </div>
   )
 }

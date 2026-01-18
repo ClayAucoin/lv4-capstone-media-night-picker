@@ -55,3 +55,14 @@
   margin: 0;
   padding: 0;
 }
+
+ul {
+  list-style-type: none;
+  padding: 5px 0 0 20px;
+}
+
+.inline-block {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
