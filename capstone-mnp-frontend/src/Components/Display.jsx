@@ -11,15 +11,14 @@ function posterKeyFor(r) {
 
   if (!slug) return null
 
-  // If it already ends with -YYYY, keep it
+  // if slug already ends with -YYYY, keep it
   if (/-\d{4}$/.test(slug)) return slug
 
-  // Otherwise append year if present
+  // otherwise append year if present
   return year ? `${slug}-${year}` : slug
 }
 
 export default function Display() {
-  // const { results, isTesting } = useAuth()
   const { results, payload } = useAuth()
   const navigate = useNavigate()
   const [postersByImdb, setPostersByImdb] = useState({})
@@ -54,7 +53,6 @@ export default function Display() {
           setPostersByImdb(Object.fromEntries(entries))
         }
       } catch (e) {
-        // last-resort catch (should be rare with allSettled)
         console.error(e)
       }
     })()

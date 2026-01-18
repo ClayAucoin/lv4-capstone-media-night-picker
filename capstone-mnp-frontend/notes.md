@@ -12,6 +12,17 @@
 
 - Check if signature exists before hitting AI
 
+### Stacks
+
+| Stacks    | Port | External URL           |
+| --------- | ---- | ---------------------- |
+| frontend  | 3080 | mnp.clayaucoin.foo     |
+| backend   | 3000 | api.clayaucoin.foo     |
+| lv4cap.ai | 3105 | lv4.ai.clayaucoin.foo  |
+| weather   | 3100 | weather.clayaucoin.foo |
+
+api9 > mnp
+
 ### INSERT new set
 
 <!--

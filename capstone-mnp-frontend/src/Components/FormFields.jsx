@@ -36,9 +36,7 @@ function todayLocalYYYYMMDD() {
 
 export default function FormFields() {
   const [sets, setSets] = useState([])
-  const { results, setResults, isTesting, formTesting, payload, setPayload } =
-    useAuth()
-  // const { results, setResults, isLoading, setIsLoading } = useAuth()
+  const { results, setResults, isTesting, formTesting, setPayload } = useAuth()
 
   const navigate = useNavigate()
 
@@ -93,7 +91,7 @@ export default function FormFields() {
   // length
   const [length, setLength] = useState("")
 
-  // disable Get Movies until all required fields are present
+  // disable button until all fields filled
   const moodsOk = selectedMoods.length > 0
   const lengthOk = length.trim().length > 0
   const dateOk = !!date
@@ -107,14 +105,13 @@ export default function FormFields() {
 
     try {
       // get values from form
-      setPayload({
+      const formPayload = {
         pv: "v2",
         zip: String(zip).trim(),
         date: date,
         len_bkt: length,
         moods: selectedMoods,
-      })
-      // console.log("payload:", payload)
+      }
 
       const local = false
       const baseUrl = `http://localhost:3000/api/v1/submit?t=${isTesting}&l=${local}`
@@ -125,36 +122,37 @@ export default function FormFields() {
           "Content-Type": "application/json",
           "x-api-key": import.meta.env.VITE_API_KEY,
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(formPayload),
       })
 
       const text = await response.text()
 
-      let data
-      try {
-        data = JSON.parse(text)
-      } catch {
-        throw new Error("Backend returned non-JSON")
+      let data = null
+      if (text) {
+        try {
+          data = JSON.parse(text)
+        } catch {
+          data = { raw: text }
+        }
       }
 
-      if (!response.ok) {
+      if (!response?.ok) {
         throw new Error(data?.error?.message ?? "Request failed")
       }
 
       setResults(data)
       setSets(await getSets())
+      setPayload(formPayload)
 
       navigate("/display")
     } finally {
-      // If you navigate away, this component typically unmounts quickly anyway,
-      // but leaving this here keeps state consistent if navigation ever changes.
       setIsLoading(false)
     }
   }
 
   return (
     <>
-      {/* Spinner overlay (Bootstrap) */}
+      {/* bootstrap spinner overlay */}
       {isLoading && (
         <div
           className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
@@ -316,7 +314,6 @@ export default function FormFields() {
                 )}
               </button>
 
-              {/* Optional tiny hint when disabled because form incomplete */}
               {!isLoading && !canSubmit && (
                 <div className="form-text mt-1">
                   Fill ZIP, date, at least one mood, and length to enable.
@@ -356,20 +353,12 @@ export default function FormFields() {
                 )}
               </ul>
             </div>
-            {/* <div>
-              <pre className="signature-display">
-                {result ? JSON.stringify(result, null, 2) : ""}
-              </pre>
-            </div> */}
           </div>
         </div>
       </div>
     </>
   )
 }
-
-// query_signature
-// moods=chill,mystery|len=B90_120|wx=STORM|pv=v1|var=default
 
 // format moods for signature
 function normalizeMoods(moods = []) {
