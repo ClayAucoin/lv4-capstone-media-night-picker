@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: true,      // important for remote access
-    port: 3080,      // your static port
+    port: 5174,      // your static port
     strictPort: true // prevents auto-increment
   }
 })
