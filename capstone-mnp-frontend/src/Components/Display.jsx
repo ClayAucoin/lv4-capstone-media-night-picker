@@ -19,7 +19,7 @@ function posterKeyFor(r) {
 }
 
 export default function Display() {
-  const { results, payload } = useAuth()
+  const { results, payload, displayRaw } = useAuth()
   const navigate = useNavigate()
   const [postersByImdb, setPostersByImdb] = useState({})
 
@@ -84,7 +84,7 @@ export default function Display() {
               >
                 {" "}
                 <div className="row mb-2 border border-0">
-                  <div className="col-1 d-flex justify-content-center align-items-center">
+                  <div className="col-2 d-flex justify-content-center align-items-center">
                     <img
                       className="rounded poster"
                       src={posterUrl}
@@ -92,7 +92,7 @@ export default function Display() {
                     />
                   </div>
 
-                  <div className="col-11">
+                  <div className="col-10">
                     <h1 className="fs-5 fw-semibold inline-block">
                       {result.title}
                     </h1>
@@ -110,19 +110,19 @@ export default function Display() {
           })}
         </ul>
       </div>
-      {/* {isTesting && ( */}
-      <div>
-        <h6>
-          <small>payload</small>
-        </h6>
-        <pre className="signature-display">
-          {payload ? JSON.stringify(payload, null, 2) : ""}
-        </pre>
-        <pre className="signature-display">
-          {resultDisplay ? JSON.stringify(resultDisplay, null, 2) : ""}
-        </pre>
-      </div>
-      {/* )} */}
+      {displayRaw && (
+        <div>
+          <h6>
+            <small>payload</small>
+          </h6>
+          <pre className="signature-display">
+            {payload ? JSON.stringify(payload, null, 2) : ""}
+          </pre>
+          <pre className="signature-display">
+            {resultDisplay ? JSON.stringify(resultDisplay, null, 2) : ""}
+          </pre>
+        </div>
+      )}
     </div>
   )
 }

@@ -36,7 +36,14 @@ function todayLocalYYYYMMDD() {
 
 export default function FormFields() {
   const [sets, setSets] = useState([])
-  const { results, setResults, isTesting, formTesting, setPayload } = useAuth()
+  const {
+    results,
+    setResults,
+    isTesting,
+    formTesting,
+    setPayload,
+    displayRaw,
+  } = useAuth()
 
   const navigate = useNavigate()
 
@@ -331,12 +338,13 @@ export default function FormFields() {
                 )}
               </small>
             </pre>
-
-            <div>
-              <pre className="json-display">
-                {results ? JSON.stringify(results, null, 2) : ""}
-              </pre>
-            </div>
+            {displayRaw && (
+              <div>
+                <pre className="json-display">
+                  {results ? JSON.stringify(results, null, 2) : ""}
+                </pre>
+              </div>
+            )}
           </div>
           <div className="col-4">
             <div>
