@@ -41,8 +41,8 @@ export default function Display() {
             if (!key) return null // skip null trakt_slug
 
             const url = await posterFromTraktMovieSlug(key)
-            return [key, url ?? "/poster-fallback.png"]
-          })
+            return [key, url ?? "../assets/poster-fallback.png"] // "/assets/poster-fallback.png"]
+          }),
         )
 
         const entries = settled
@@ -74,7 +74,7 @@ export default function Display() {
       <div>
         <ul className="list-group">
           {resultDisplay?.map((result) => {
-            const key = posterKeyFor(result) || `${result.title}-${result.year}` // fallback for rare nulls
+            const key = posterKeyFor(result) || `${result.title}-${result.year}`
             const posterUrl = postersByImdb[key] || "/poster-fallback.png"
 
             return (
@@ -109,6 +109,7 @@ export default function Display() {
             )
           })}
         </ul>
+        {/* <img src="/assets/poster-fallback.png" /> */}
       </div>
       {displayRaw && (
         <div>
