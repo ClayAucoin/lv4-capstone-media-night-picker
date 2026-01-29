@@ -2,12 +2,11 @@
 
 import express from "express"
 import { sendError } from "../utils/sendError.js"
-import { validateWxAPIKey } from "../middleware/validator-keys.js"
+import { validateAPIKey } from "../middleware/validator-keys.js"
 import { validateWeatherVars } from "../middleware/validator-wx.js"
 import { parseBoolean, normalizeCondition, buildQuerySignature } from '../utils/helpers.js'
 import { requestId } from "../middleware/requestId.js"
 import { config } from "../config.js"
-import { dummyDataSets } from "../data/dummy-data/data-sets.js"
 import supabase from "../utils/supabase.js"
 
 const router = express.Router()
@@ -16,16 +15,15 @@ const SETS_TABLE = "lv4_cap_recommendation_sets"
 const RECOMMENDATIONS_TABLE = "lv4_cap_recommendations"
 let REQ_ID, QUERY_SIG, WX_URL, AI_URL, ADD_AI_URL
 
-router.post("/submit", requestId, async (req, res, next) => {
+router.post("/submit", validateAPIKey, requestId, async (req, res, next) => {
   const apiHeader = config.api_key
   REQ_ID = req.req_id
 
-  const local = parseBoolean(req.query.l)
   const is_testing = parseBoolean(req.query.t)
+  const useLocal = parseBoolean(req.query.l)
   const { pv, zip, date, len_bkt, moods } = req.body
   const req_body = req.body
   req.log.info({ route: "/submit", file: "read-submit.js", req_body: req.body, step: "bk-core: req.body" }, "parameters")
-  // req.log.info({ req_id: REQ_ID, route: "/submit", file: "read-submit.js", req_body: req.body, step: "bk-core: req.body" }, "parameters")
 
   // const inputParameters = { pv, date, zip, len_bkt, moods }
   const wxPayload = { zip: zip, date: date }
@@ -33,17 +31,13 @@ router.post("/submit", requestId, async (req, res, next) => {
 
   // get wx condition
   req.log.info({ route: "/submit", file: "read-submit.js", wxPayload: wxPayload, step: "b4 getWxCondition success response" }, "variable")
-  // req.log.info({ req_id: REQ_ID, route: "/submit", file: "read-submit.js", wxPayload: wxPayload, step: "b4 getWxCondition success response" }, "variable")
 
-  const data = await getWxCondition(wxPayload, is_testing, local)
+  const data = await getWxCondition(wxPayload, is_testing, useLocal)
   const wx_condition = data.conditions
   req.log.info({ route: "/submit", file: "read-submit.js", wx_condition: data, step: "getWxCondition success response" }, "function response")
   req.log.info({ route: "/submit", file: "read-submit.js", WX_URL: WX_URL, step: "bk-core: baseUrl" }, "WX URL")
-  // req.log.info({ req_id: REQ_ID, route: "/submit", file: "read-submit.js", wx_condition: data, step: "getWxCondition success response" }, "function response")
-  // req.log.info({ req_id: REQ_ID, route: "/submit", file: "read-submit.js", WX_URL: WX_URL, step: "bk-core: baseUrl" }, "WX URL")
 
-  console.log("here")
-  console.log("data.conditions:", data.conditions)
+  // console.log("data.conditions:", data.conditions)
 
   // build signature for query_signature lookup
   QUERY_SIG = buildQuerySignature({
@@ -54,9 +48,7 @@ router.post("/submit", requestId, async (req, res, next) => {
   })
 
   // query_signature check
-  // QUERY_SIG = query_signature
   req.log.info({ route: "/submit", file: "read-submit.js", query_string: QUERY_SIG, step: "bk-core: query_signature, before query_signature_ck" }, "variable")
-  // req.log.info({ req_id: REQ_ID, route: "/submit", file: "read-submit.js", query_string: QUERY_SIG, step: "bk-core: query_signature, before query_signature_ck" }, "variable")
 
   const { data: ck_qs, error: ck_err } = await supabase
     .from(SETS_TABLE)
@@ -65,7 +57,6 @@ router.post("/submit", requestId, async (req, res, next) => {
     .limit(1)
 
   req.log.info({ route: "/submit", file: "read-submit.js", ck_qs: ck_qs, step: "bk-core: ck_qs, query_signature_ck response" }, "variable")
-  // req.log.info({ req_id: REQ_ID, route: "/submit", file: "read-submit.js", ck_qs: ck_qs, step: "bk-core: ck_qs, query_signature_ck response" }, "variable")
 
   if (ck_err) {
     return next(sendError(500, "Failed to read data", "READ_ERROR", { underlying: ck_err.message }))
@@ -75,17 +66,15 @@ router.post("/submit", requestId, async (req, res, next) => {
   if (ck_qs.length === 0) {
     // get ai response
     aiPayload = { wx_bkt: wx_condition, ...aiBase }
-    aiResponse = await getAiSuggestions(aiPayload, is_testing, local)
+    aiResponse = await getAiSuggestions(aiPayload, is_testing, useLocal)
     req.log.info({ route: "/submit", file: "read-submit.js", data_ai: aiResponse, step: "bk-core: getAiSuggestions success" }, "function response")
     req.log.info({ route: "/submit", file: "read-submit.js", AI_URL: AI_URL, step: "bk-core: baseUrl" }, "AI URL")
-    // req.log.info({ req_id: REQ_ID, route: "/submit", file: "read-submit.js", data_ai: aiResponse, step: "bk-core: getAiSuggestions success" }, "function response")
-    // req.log.info({ req_id: REQ_ID, route: "/submit", file: "read-submit.js", AI_URL: AI_URL, step: "bk-core: baseUrl" }, "AI URL")
 
     addPayload = {
       "ok": true,
       "req_id": REQ_ID,
       "is_testing": is_testing,
-      "is_local": local,
+      "useLocal": useLocal,
       "inputParameters": {
         "count": 5,
         "len_bkt": len_bkt,
@@ -98,7 +87,6 @@ router.post("/submit", requestId, async (req, res, next) => {
       }
     }
     req.log.info({ route: "/submit", file: "read-submit.js", addPayload: addPayload, step: "bk-core: addPayload, before addAiSuggestions" }, "variable")
-    // req.log.info({ req_id: REQ_ID, route: "/submit", file: "read-submit.js", addPayload: addPayload, step: "bk-core: addPayload, before addAiSuggestions" }, "variable")
 
     sendData = await addAiSuggestions(addPayload)
 
@@ -123,21 +111,19 @@ router.post("/submit", requestId, async (req, res, next) => {
     }
   }
   req.log.info({ route: "/submit", file: "read-submit.js", ADD_AI_URL: ADD_AI_URL, step: "bk-core: ADD_AI_URL" }, "ADD AI URL")
-  // req.log.info({ req_id: REQ_ID, route: "/submit", file: "read-submit.js", ADD_AI_URL: ADD_AI_URL, step: "bk-core: ADD_AI_URL" }, "ADD AI URL")
 
   req.log.info({ route: "/submit", file: "read-submit.js", data_existing: sendData, message: message, step: "bk-core: sendData" }, "sendData")
-  // req.log.info({ req_id: REQ_ID, route: "/submit", file: "read-submit.js", data_existing: sendData, message: message, step: "bk-core: sendData" }, "sendData")
-  console.log(`POST /read-submit testing: ${is_testing}, local: ${local}`)
+  console.log(`POST /read-submit testing: ${is_testing}, local: ${useLocal}`)
   res.status(200).json(sendData)
 })
 
 export default router
 
-async function getWxCondition(wxPayload, is_testing = true, local = true) {
-  if (!local) {
-    WX_URL = `https://api.clayaucoin.foo/api/v1/weather?t=${is_testing}&l=${local}&`
+async function getWxCondition(wxPayload, is_testing = true, useLocal = true) {
+  if (!useLocal) {
+    WX_URL = `https://api.clayaucoin.foo/api/v1/weather?t=${is_testing}&l=${useLocal}&`
   } else {
-    WX_URL = `http://localhost:3000/api/v1/weather?t=${is_testing}&l=${local}&`
+    WX_URL = `http://localhost:3000/api/v1/weather?t=${is_testing}&l=${useLocal}&`
   }
   const apiHeader = config.wx_api_key
   const baseUrl = WX_URL
@@ -158,8 +144,8 @@ async function getWxCondition(wxPayload, is_testing = true, local = true) {
   return data
 }
 
-async function getAiSuggestions(aiPayload, is_testing = true, local = true) {
-  if (!local) {
+async function getAiSuggestions(aiPayload, is_testing = true, useLocal = true) {
+  if (!useLocal) {
     AI_URL = `https://api.clayaucoin.foo/api/v1/ai?t=${is_testing}`
   } else {
     AI_URL = `http://localhost:3000/api/v1/ai?t=${is_testing}`
@@ -177,10 +163,10 @@ async function getAiSuggestions(aiPayload, is_testing = true, local = true) {
   return data
 }
 
-async function addAiSuggestions(addPayload, is_testing = true, local = true) {
+async function addAiSuggestions(addPayload, is_testing = true, useLocal = true) {
   // const aiUrl = `http://localhost:3000/api/v1/add`
 
-  if (!local) {
+  if (!useLocal) {
     ADD_AI_URL = `http://api.clayaucoin.foo/api/v1/add`
   } else {
     ADD_AI_URL = `http://localhost:3000/api/v1/add`

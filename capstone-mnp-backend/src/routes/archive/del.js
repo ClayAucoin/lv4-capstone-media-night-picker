@@ -1,8 +1,8 @@
-// src/routes/del.js
+// src/routes/archive/del.js
 
 import express from "express"
 import { validateId } from "../middleware/validators.js";
-import { sendError } from "../utils/sendError.js";
+import { sendError } from "../../utils/sendError.js";
 
 const router = express.Router()
 router.use(express.json());
