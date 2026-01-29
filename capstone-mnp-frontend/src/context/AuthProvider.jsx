@@ -9,6 +9,7 @@ export function AuthProvider({ children }) {
   const [payload, setPayload] = useState([])
 
   const isTesting = import.meta.env.VITE_IS_TESTING === "true"
+  const useLocal = import.meta.env.VITE_USE_LOCAL === "true"
   const formTesting = import.meta.env.VITE_FORM_TESTING === "true"
 
   if (isLoading) return <p>Loading...</p>
@@ -19,6 +20,7 @@ export function AuthProvider({ children }) {
     isLoading,
     setIsLoading,
     isTesting,
+    useLocal,
     formTesting,
     payload,
     setPayload,

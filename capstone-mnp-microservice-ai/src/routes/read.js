@@ -2,6 +2,7 @@
 
 import express from "express"
 import { validateAPIKey, validateMoodBucket, validateLengthBucket, validateWxBucket } from "../middleware/validators.js"
+import { requestId } from "../middleware/requestId.js"
 import { config } from "../config.js"
 import { dummyDataSets } from "../data/data-sets.js"
 import { sendError } from "../utils/sendError.js"
@@ -10,9 +11,9 @@ import { OpenAI } from "openai"
 const router = express.Router()
 
 // ---- POST /api/v1/ai?t=true route ----
-router.post('/', validateAPIKey, validateMoodBucket, validateLengthBucket, validateWxBucket, async (req, res, next) => {
+router.post('/', validateAPIKey, requestId, validateMoodBucket, validateLengthBucket, validateWxBucket, async (req, res, next) => {
   const is_testing = parseBoolean(req.query.t)
-  const local = parseBoolean(req.query.l)
+  const req_id = req.req_id
   console.log(`POST /api/v1/ai testing: ${is_testing}`)
 
   const count = 5

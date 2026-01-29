@@ -1,6 +1,9 @@
 ## Todo
 
 - validate input
+- send api-key to backend
+- CHECK APPS
+  - Backend
 
 ### Stacks
 
@@ -10,6 +13,8 @@
 | Express.js                | backend-api   |    3000    |    3000     | [api.clayaucoin.foo](https://api.clayaucoin.foo)         |
 | Express.js (microservice) | ms-wx-weather |    3100    |    3100     | [weather.clayaucoin.foo](https://weather.clayaucoin.foo) |
 | Express.js (microservice) | ms-ai-lv4.ai  |    3105    |    3105     | [lv4.ai.clayaucoin.foo](https://lv4.ai.clayaucoin.foo)   |
+| Loki                      |               |    3110    |    3110     | [192.168.1.129:3110](http://192.168.1.129:3110)          |
+| Grafana                   |               |    3001    |    3001     | [192.168.1.129:3001](http://192.168.1.129:3001)          |
 
 ### INSERT new set
 

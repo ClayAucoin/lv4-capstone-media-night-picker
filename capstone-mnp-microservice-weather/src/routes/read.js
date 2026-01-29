@@ -2,14 +2,16 @@
 
 import express from "express"
 import { validateAPIKey, validateWeatherVars } from "../middleware/validators.js"
+import { requestId } from "../middleware/requestId.js"
 import { config } from "../config.js"
 import { sendError } from "../utils/sendError.js"
 
 const router = express.Router()
 
 // ---- POST /api/v1/weather route ----
-router.post('/', validateAPIKey, validateWeatherVars, async (req, res, next) => {
+router.post('/', validateAPIKey, requestId, validateWeatherVars, async (req, res, next) => {
   console.log('POST /api/v1/weather')
+  const req_id = req.req_id
 
   const { zip, dateString } = req.weatherParams
 

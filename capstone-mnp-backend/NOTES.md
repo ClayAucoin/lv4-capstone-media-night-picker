@@ -2,6 +2,8 @@
 
 - Root router
   - add directions
+- read-submit.js
+  - validate incoming API ket for this app
 
 ## Wishlist
 

@@ -4,6 +4,7 @@ import express from "express"
 import { sendError } from "../utils/sendError.js"
 import { validateWxAPIKey } from "../middleware/validator-keys.js"
 import { validateWeatherVars } from "../middleware/validator-wx.js"
+import { requestId } from "../middleware/requestId.js"
 import { config } from "../config.js"
 import { dummyDataSets } from "../data/dummy-data/data-sets.js"
 import supabase from "../utils/supabase.js"
@@ -12,9 +13,11 @@ const router = express.Router()
 
 const SETS_TABLE = "lv4_cap_recommendation_sets"
 const RECOMMENDATIONS_TABLE = "lv4_cap_recommendations"
+let REQ_ID
 
-router.post("/submit", async (req, res, next) => {
+router.post("/submit", requestId, async (req, res, next) => {
   const apiHeader = config.api_key
+  REQ_ID = req.req_id
 
   const local = parseBoolean(req.query.l)
   const is_testing = parseBoolean(req.query.t)
@@ -24,8 +27,8 @@ router.post("/submit", async (req, res, next) => {
   const wxPayload = { zip: zip, date: date }
   const aiBase = { len_bkt: len_bkt, moods: moods }
 
-  // try {
   // get wx condition
+  req.log.info({ req_id: req.req_id, step: "sbmt: before getWxCondition call" }, "Flow step")
   const data = await getWxCondition(wxPayload, local)
 
   // build signature for query_signature lookup
@@ -34,11 +37,11 @@ router.post("/submit", async (req, res, next) => {
     length: len_bkt,
     weather: normalizeCondition(data.conditions),
     pv: "v2",
-
   })
-  console.log("sbmt: query_signature:", query_signature)
 
   // query_signature check
+  req.log.info({ req_id: req.req_id, query_string: `${query_signature}`, step: `sbmt: before query_signature: ${query_signature}` }, "Flow step")
+  console.log("query_signature:", query_signature)
   const { data: ck_qs, error: ck_err } = await supabase
     .from(SETS_TABLE)
     .select("id, query_signature")
@@ -46,7 +49,6 @@ router.post("/submit", async (req, res, next) => {
     .limit(1)
 
   if (ck_err) {
-    // console.error("checkQuerySignature error:", ck_err.message)
     return next(sendError(500, "Failed to read data", "READ_ERROR", { underlying: ck_err.message }))
   }
 
@@ -55,10 +57,8 @@ router.post("/submit", async (req, res, next) => {
     // console.log("new data")
     // get ai response
     aiPayload = { wx_bkt: data.conditions, ...aiBase }
-
-    console.log("sbmt: ai sugestions: start")
+    req.log.info({ req_id: req.req_id, step: "sbmt: getAiSuggestions call" }, "Flow step")
     aiResponse = await getAiSuggestions(aiPayload, is_testing, local)
-    console.log("sbmt: ai sugestions: back")
 
     addPayload = {
       "ok": true,
@@ -101,24 +101,25 @@ router.post("/submit", async (req, res, next) => {
 
   // console.log(sendData)
 
-  console.log("POST /read-submit")
+  console.log(`POST /read-submit testing: ${is_testing}, local: ${local}`)
   res.status(200).json(sendData)
-  // } catch (err) {
-  //   next(sendError(500, "Internal server error", "INTERNAL_ERROR_BKEND_SBMT"))
-  // }
 })
 
 export default router
 
 async function getWxCondition(wxPayload, local = true) {
-  // const wxUrl = "https://api.clayaucoin.foo/api/v1/wx?l=false&"
-  const wxUrl = "http://localhost:3000/api/v1/wx?l=false&"
+  let wxUrl
+  if (!local) {
+    wxUrl = `https://api.clayaucoin.foo/api/v1/wx?l=${local}&`
+  } else {
+    wxUrl = `http://localhost:3000/api/v1/wx?l=${local}&`
+  }
   const apiHeader = config.wx_api_key
   const baseUrl = wxUrl + "t=" + true
 
   const response = await fetch(baseUrl, {
     method: "POST",
-    headers: { "Content-Type": "application/json", "x-api-key": apiHeader },
+    headers: { "Content-Type": "application/json", "x-api-key": apiHeader, "x-request-id": REQ_ID },
     body: JSON.stringify(wxPayload),
   })
   const data = await response.json()
@@ -126,15 +127,19 @@ async function getWxCondition(wxPayload, local = true) {
   return data
 }
 
-async function getAiSuggestions(aiPayload, is_testing = true) {
-  // const aiUrl = `https://api.clayaucoin.foo/api/v1/ai?t=${is_testing}`
-  const aiUrl = `http://localhost:3000/api/v1/ai?t=${is_testing}`
+async function getAiSuggestions(aiPayload, is_testing = true, local = true) {
+  let aiUrl
+  if (!local) {
+    aiUrl = `https://api.clayaucoin.foo/api/v1/ai?t=${is_testing}`
+  } else {
+    aiUrl = `http://localhost:3000/api/v1/ai?t=${is_testing}`
+  }
   const apiHeader = config.ai_api_key
   const baseUrl = aiUrl
 
   const response = await fetch(baseUrl, {
     method: "POST",
-    headers: { "Content-Type": "application/json", "x-api-key": apiHeader },
+    headers: { "Content-Type": "application/json", "x-api-key": apiHeader, "x-request-id": REQ_ID },
     body: JSON.stringify(aiPayload),
   })
   const data = await response.json()

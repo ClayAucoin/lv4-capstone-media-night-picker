@@ -3,6 +3,7 @@
 import dotenv from "dotenv"
 
 dotenv.config()
+dotenv.config({ path: ".env.local" })
 
 export const config = {
   port: process.env.PORT || 3000,
@@ -12,6 +13,7 @@ export const config = {
   ai_api_key: process.env.AI_API_KEY || "",
   supabaseUrl: process.env.SUPABASE_URL || "",
   supabaseKey: process.env.SUPABASE_ANON_KEY || "",
+  loki_host: process.env.LOKI_HOST,
 
   dbUrl: process.env.DB_URL || ""
 }

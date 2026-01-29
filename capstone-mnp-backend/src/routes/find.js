@@ -10,7 +10,7 @@ router.use(express.json());
 router.get("/:id", validateId, (req, res, next) => {
   console.log("GET /find/id")
 
-  console.log("id:", req.params, "typeof:", typeof req.params)
+  // console.log("id:", req.params, "typeof:", typeof req.params)
 
   const id = Number(req.params.id)
   const movie = data.find((entry) => entry.id === id)

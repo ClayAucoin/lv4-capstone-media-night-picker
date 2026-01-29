@@ -18,7 +18,7 @@
 env/
 venv/
 ENV/
-.env
+.env*
 .env.test
 env*
 ENV*

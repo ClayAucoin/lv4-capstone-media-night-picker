@@ -37,7 +37,7 @@ router.post("/wx", validateWxAPIKey, validateWeatherVars, async (req, res, next)
       }),
     })
     const data = await response.json()
-    console.log("GET /read-wx")
+    console.log("POST /read-wx")
     res.status(200).json({
       ok: true,
       local: local,
@@ -45,7 +45,7 @@ router.post("/wx", validateWxAPIKey, validateWeatherVars, async (req, res, next)
       conditions: data.conditions
     })
   } catch (err) {
-    next(sendError(500, "Internal server error", "INTERNAL_ERROR_BKEND_WX"))
+    next(sendError(500, "Internal server error", "INTERNAL_ERROR_BKEND_WX", { underlying: err.stack }))
   }
 })
 

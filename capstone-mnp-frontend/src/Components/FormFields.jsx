@@ -36,7 +36,7 @@ function todayLocalYYYYMMDD() {
 
 export default function FormFields() {
   const [sets, setSets] = useState([])
-  const { setResults, isTesting, formTesting, setPayload } = useAuth()
+  const { setResults, isTesting, useLocal, formTesting, setPayload } = useAuth()
 
   const navigate = useNavigate()
   const [showRaw, setShowRaw] = useState(false)
@@ -115,15 +115,22 @@ export default function FormFields() {
         moods: selectedMoods,
       }
 
-      const local = false
-      // const baseUrl = `http://localhost:3000/api/v1/submit?t=${isTesting}&l=${local}`
-      const baseUrl = `https://api.clayaucoin.foo/api/v1/submit?t=${isTesting}&l=${local}`
+      let baseUrl
+      if (!useLocal) {
+        baseUrl = `https://api.clayaucoin.foo/api/v1/submit?t=${isTesting}&l=${useLocal}`
+      } else {
+        baseUrl = `http://localhost:3000/api/v1/submit?t=${isTesting}&l=${useLocal}`
+      }
+      // console.log("baseUrl:", baseUrl)
+
+      const reqId = crypto.randomUUID()
 
       const response = await fetch(baseUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "x-api-key": import.meta.env.VITE_API_KEY,
+          "x-request-id": reqId,
         },
         body: JSON.stringify(formPayload),
       })
@@ -138,6 +145,7 @@ export default function FormFields() {
           data = { raw: text }
         }
       }
+      // console.log("data:", data)
 
       if (!response?.ok) {
         throw new Error(data?.error?.message ?? "Request failed")
