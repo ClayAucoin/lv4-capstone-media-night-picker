@@ -3,7 +3,7 @@
 import express from "express";
 
 // routes
-import readRouter from "./read.js"
+import readRouter from "./ai-ms.js"
 
 const itemsRouter = express.Router()
 

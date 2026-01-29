@@ -15,9 +15,13 @@ router.post('/', validateAPIKey, requestId, validateWeatherVars, async (req, res
 
   const { zip, dateString } = req.weatherParams
 
+  req.log.info({ req_id: req_id, route: "/weather", file: "wx-ms.js", req_weatherParams: req.weatherParams, step: "wx-ms: req.weatherParams" }, "parameters")
+
   const apiKey = config.weather_key
   const baseUrl = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${zip}/${dateString}`;
   const fetchUrl = `${baseUrl}?unitGroup=us&include=current&contentType=json&key=${apiKey}`;
+
+  req.log.info({ req_id: req_id, route: "/weather", file: "wx-ms.js", baseUrl: baseUrl, step: "wx-ms: baseUrl" }, "WX URL")
 
   try {
     const result = await fetch(fetchUrl)
@@ -54,7 +58,7 @@ router.post('/', validateAPIKey, requestId, validateWeatherVars, async (req, res
     }
     const source = dayData || current
 
-    res.json({
+    const sendData = {
       reqDate: dateString,
       temp: source.temp,
       precipitation: source.precip,
@@ -64,7 +68,10 @@ router.post('/', validateAPIKey, requestId, validateWeatherVars, async (req, res
       sunset: source.sunset,
       description: dayData?.description || source.conditions,
       // raw: data,
-    })
+    }
+    req.log.info({ req_id: req_id, route: "/weather", file: "wx-ms.js", sendData: sendData, step: "wx-ms: sendData" }, "variable")
+
+    res.json(sendData)
   } catch (err) {
     console.error(err)
     return next(sendError(500, "Internal server error", "INTERNAL_ERROR_MS_WX", {

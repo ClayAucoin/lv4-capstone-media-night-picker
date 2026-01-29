@@ -38,6 +38,8 @@ app.use("/api/v1", itemsRouter)
 export function globalErrorHandler(err, req, res, next) {
   const status = err.status || 500
 
+  console.log("stack:", err.stack || err)
+
   req.log.error(
     {
       req_id: req.req_id,

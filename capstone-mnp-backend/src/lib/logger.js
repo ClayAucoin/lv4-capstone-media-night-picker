@@ -16,7 +16,7 @@ if (lokiHost) {
   const transport = pino.transport({
     target: "pino-loki",
     options: {
-      host: lokiHost,                 // required :contentReference[oaicite:1]{index=1}
+      host: lokiHost,                         // required :contentReference[oaicite:1]{index=1}
       labels: { service, env },        // adds labels to all logs :contentReference[oaicite:2]{index=2}
       // batching is on by default; you can tune if you want :contentReference[oaicite:3]{index=3}
       batching: { interval: 5, maxBufferSize: 10000 },

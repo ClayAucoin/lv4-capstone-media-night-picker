@@ -124,6 +124,7 @@ export default function FormFields() {
       // console.log("baseUrl:", baseUrl)
 
       const reqId = crypto.randomUUID()
+      console.log("reqId:", reqId)
 
       const response = await fetch(baseUrl, {
         method: "POST",
@@ -145,9 +146,9 @@ export default function FormFields() {
           data = { raw: text }
         }
       }
-      // console.log("data:", data)
 
       if (!response?.ok) {
+        console.log("data:", data)
         throw new Error(data?.error?.message ?? "Request failed")
       }
 

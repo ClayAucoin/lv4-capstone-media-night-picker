@@ -4,25 +4,28 @@ import express from "express"
 import { sendError } from "../utils/sendError.js"
 import { validateWxAPIKey } from "../middleware/validator-keys.js"
 import { validateWeatherVars } from "../middleware/validator-wx.js"
+import { parseBoolean } from '../utils/helpers.js'
+import { requestId } from "../middleware/requestId.js"
 import { config } from "../config.js"
 
 const router = express.Router()
 
-router.post("/wx", validateWxAPIKey, validateWeatherVars, async (req, res, next) => {
-
+router.post("/wx", requestId, validateWxAPIKey, validateWeatherVars, async (req, res, next) => {
+  const req_id = req.req_id
   const local = parseBoolean(req.query.l)
 
-  let url
+  let baseUrl
   if (!local) {
-    url = "https://weather.clayaucoin.foo/api/v1/weather?"
+    baseUrl = "https://weather.clayaucoin.foo/api/v1/weather?"
   } else {
-    url = "http://localhost:3100/api/v1/weather?"
+    baseUrl = "http://localhost:3100/api/v1/weather?"
   }
+  req.log.info({ req_id: req_id, route: "/wx", file: "read-ws.js", baseUrl: baseUrl, step: "bk-wx: baseUrl" }, "URL")
 
   const { zip, dateString } = req.weatherParams
+  req.log.info({ req_id: req_id, route: "/wx", file: "read-ws.js", req_weatherParams: req.weatherParams, step: "bk-wx: req.weatherParams" }, "parameters")
 
   const apiHeader = config.wx_api_key
-  const baseUrl = url + "t=" + true
 
   try {
     const response = await fetch(baseUrl, {
@@ -38,12 +41,17 @@ router.post("/wx", validateWxAPIKey, validateWeatherVars, async (req, res, next)
     })
     const data = await response.json()
     console.log("POST /read-wx")
-    res.status(200).json({
+
+    const sendData = {
       ok: true,
       local: local,
       data: data,
       conditions: data.conditions
-    })
+    }
+
+    req.log.info({ req_id: req_id, route: "/wx", file: "read-ws.js", sendData: sendData, step: "bk-wx: sendData" }, "variable")
+
+    res.status(200).json(sendData)
   } catch (err) {
     next(sendError(500, "Internal server error", "INTERNAL_ERROR_BKEND_WX", { underlying: err.stack }))
   }
@@ -51,9 +59,3 @@ router.post("/wx", validateWxAPIKey, validateWeatherVars, async (req, res, next)
 
 export default router
 
-function parseBoolean(value = "true") {
-  const v = value.toLowerCase()
-  if (v === "true") return true
-  if (v === "false") return false
-  return value
-}

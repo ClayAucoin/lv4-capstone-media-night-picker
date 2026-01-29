@@ -2,6 +2,7 @@
 
 import { config } from '../config.js'
 import { sendError } from "../utils/sendError.js"
+import { parseBoolean } from '../utils/helpers.js'
 
 export function validateAPIKey(req, _res, next) {
   // ask = App Service Key
@@ -140,12 +141,5 @@ export function validateWxBucket(req, _res, next) {
   } catch (err) {
     next(err)
   }
-}
-
-function parseBoolean(value = "true") {
-  const v = value.toLowerCase()
-  if (v === "true") return true
-  if (v === "false") return false
-  return value
 }
 
