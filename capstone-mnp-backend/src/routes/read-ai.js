@@ -18,47 +18,47 @@ router.post("/ai", requestId, validateAIAPIKey, validateMoodBucket, validateLeng
   let baseUrl
   let where
   if (!local) {
-    baseUrl = `https://lv4.ai.clayaucoin.foo/api/v1/ai?t=${is_testing}`
+    baseUrl = `https://lv4.ai.clayaucoin.foo/api/v1/ai?t=${is_testing}&l=${local}`
     where = "online"
   } else {
-    baseUrl = `http://localhost:3105/api/v1/ai?t=${is_testing}`
+    baseUrl = `http://localhost:3105/api/v1/ai?t=${is_testing}&l=${local}`
     where = "local"
   }
-  req.log.info({ req_id: req_id, route: "/ai", file: "read-ai", baseUrl: baseUrl, step: "bk-ai: baseUrl" }, "variable")
+  req.log.info({ route: "/ai", file: "read-ai.js", baseUrl: baseUrl, step: "bk-ai: baseUrl" }, "variable")
 
   const apiHeader = config.ai_api_key
   const moods = req.moods
   const len_bkt = req.len_bkt
   const wx_bkt = req.wx_bkt
 
-  try {
-    const response = await fetch(baseUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiHeader,
-      },
-      body: JSON.stringify({
-        "len_bkt": len_bkt,
-        "wx_bkt": wx_bkt,
-        "moods": moods
-      }),
-    })
-    const data = await response.json()
-    console.log("POST /ai")
+  // try {
+  const response = await fetch(baseUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": apiHeader,
+    },
+    body: JSON.stringify({
+      "len_bkt": len_bkt,
+      "wx_bkt": wx_bkt,
+      "moods": moods
+    }),
+  })
+  const data = await response.json()
+  console.log(`POST /ai testing: ${is_testing}, local: ${local}`)
 
-    const sendData = {
-      ok: true,
-      testing: is_testing,
-      where: where,
-      data: data,
-    }
-    req.log.info({ req_id: req_id, route: "/ai", file: "read-ai", sendData: sendData, step: "bk-ai: sendData" }, "variable")
-
-    res.status(200).json(sendData)
-  } catch (err) {
-    next(sendError(500, "Internal server error", "INTERNAL_ERROR_BKEND_AI"))
+  const sendData = {
+    ok: true,
+    testing: is_testing,
+    where: where,
+    data: data,
   }
+  req.log.info({ route: "/ai", file: "read-ai.js", sendData: sendData, step: "bk-ai: sendData" }, "variable")
+
+  res.status(200).json(sendData)
+  // } catch (err) {
+  //   next(sendError(500, "Internal server error", "INTERNAL_ERROR_BKEND_AI"))
+  // }
 })
 
 export default router

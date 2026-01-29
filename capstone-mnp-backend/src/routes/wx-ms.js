@@ -1,0 +1,84 @@
+// src/routes/read.js
+
+import express from "express"
+import { validateVCAPIKey } from "../middleware/validator-keys.js"
+import { validateWeatherVars } from "../middleware/validator-wx.js"
+import { parseBoolean } from "../utils/helpers.js"
+import { requestId } from "../middleware/requestId.js"
+import { config } from "../config.js"
+import { sendError } from "../utils/sendError.js"
+
+const router = express.Router()
+
+// ---- POST /api/v1/weather route ----
+router.post('/weather', validateVCAPIKey, requestId, validateWeatherVars, async (req, res, next) => {
+  const local = parseBoolean(req.query.l)
+  const is_testing = parseBoolean(req.query.t)
+
+  console.log(`POST /api/v1/weather testing: ${is_testing}, local: ${local}`)
+  const req_id = req.req_id
+
+  const { zip, dateString } = req.weatherParams
+
+  req.log.info({ route: "/weather", file: "wx-ms.js", req_weatherParams: req.weatherParams, step: "wx-ms: req.weatherParams" }, "parameters")
+  // req.log.info({ req_id: req_id, route: "/weather", file: "wx-ms.js", req_weatherParams: req.weatherParams, step: "wx-ms: req.weatherParams" }, "parameters")
+
+  const apiKey = config.vc_weather_key
+  const baseUrl = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${zip}/${dateString}`;
+  const fetchUrl = `${baseUrl}?unitGroup=us&include=current&contentType=json&key=${apiKey}`;
+
+  req.log.info({ route: "/weather", file: "wx-ms.js", baseUrl: baseUrl, step: "wx-ms: baseUrl" }, "WX URL")
+  // req.log.info({ req_id: req_id, route: "/weather", file: "wx-ms.js", baseUrl: baseUrl, step: "wx-ms: baseUrl" }, "WX URL")
+
+  // try {
+  const result = await fetch(fetchUrl)
+  const rawBody = await result.text();
+
+  if (!result.ok) {
+    return next(sendError(502, "Upstream weather provider error", "UPSTREAM_ERROR", {
+      upstreamStatus: result.status,
+      upstreamStatusText: result.statusText,
+      upstreamBody: rawBody.slice(0, 300)
+    }))
+  }
+
+  let data;
+  try {
+    data = JSON.parse(rawBody);
+  } catch (e) {
+    return next(sendError(502, "Upstream returned non-JSON response", "UPSTREAM_NON_JSON", { upstreamStatus: result.status, upstreamBody: rawBody.slice(0, 300) }))
+  }
+
+  // const data = await result.json()
+  const dayData = data.days && data.days[0]
+  const current = data.currentConditions
+
+  if (!dayData && !current) return res.status(404).json({ ok: true, message: "No weather data found for that date.", date: dateString })
+
+  const source = dayData || current
+
+  const sendData = {
+    req_id: req_id,
+    reqDate: dateString,
+    temp: source.temp,
+    precipitation: source.precip,
+    conditions: source.conditions,
+    icon: source.icon,
+    sunrise: source.sunrise,
+    sunset: source.sunset,
+    description: dayData?.description || source.conditions,
+    // raw: data,
+  }
+  req.log.info({ route: "/weather", file: "wx-ms.js", sendData: sendData, step: "wx-ms: sendData" }, "sendData")
+  // req.log.info({ req_id: req_id, route: "/weather", file: "wx-ms.js", sendData: sendData, step: "wx-ms: sendData" }, "sendData")
+
+  res.json(sendData)
+  // } catch (err) {
+  //   console.error(err)
+  //   return next(sendError(500, "Internal server error", "INTERNAL_ERROR_MS_WX", {
+  //     underlying: err.message
+  //   }))
+  // }
+})
+
+export default router

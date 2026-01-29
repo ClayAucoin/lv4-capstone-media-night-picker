@@ -8,9 +8,11 @@ export function AuthProvider({ children }) {
   const [isLoading, setIsLoading] = useState(false)
   const [payload, setPayload] = useState([])
 
-  const isTesting = import.meta.env.VITE_IS_TESTING === "true"
-  const useLocal = import.meta.env.VITE_USE_LOCAL === "true"
   const formTesting = import.meta.env.VITE_FORM_TESTING === "true"
+
+  const params = new URLSearchParams(window.location.search)
+  const isTesting = params.get("t") === "true"
+  const useLocal = params.get("l") === "true"
 
   if (isLoading) return <p>Loading...</p>
 

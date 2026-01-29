@@ -1,12 +1,12 @@
-// src/routes/read-wx.js
+// src/routes/archive/read-wx.js
 
 import express from "express"
-import { sendError } from "../utils/sendError.js"
-import { validateWxAPIKey } from "../middleware/validator-keys.js"
-import { validateWeatherVars } from "../middleware/validator-wx.js"
-import { parseBoolean } from '../utils/helpers.js'
-import { requestId } from "../middleware/requestId.js"
-import { config } from "../config.js"
+import { sendError } from "../../utils/sendError.js"
+import { validateWxAPIKey } from "../../middleware/validator-keys.js"
+import { validateWeatherVars } from "../../middleware/validator-wx.js"
+import { parseBoolean } from '../../utils/helpers.js'
+import { requestId } from "../../middleware/requestId.js"
+import { config } from "../../config.js"
 
 const router = express.Router()
 
@@ -41,6 +41,7 @@ router.post("/wx", requestId, validateWxAPIKey, validateWeatherVars, async (req,
     })
     const data = await response.json()
     console.log("POST /read-wx")
+    req.log.info({ req_id: req_id, route: "/wx", file: "read-ws.js", data: data, step: "bk-wx: datafrom resposne" }, "fetch response")
 
     const sendData = {
       ok: true,

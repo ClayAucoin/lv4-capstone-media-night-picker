@@ -14,11 +14,9 @@ const router = express.Router()
 // ---- POST /api/v1/ai?t=true route ----
 router.post('/', validateAPIKey, requestId, validateMoodBucket, validateLengthBucket, validateWxBucket, async (req, res, next) => {
   const is_testing = parseBoolean(req.query.t)
-  // let is_testing = parseBoolean(req.query.t)
-  // is_testing = false
 
   const req_id = req.req_id
-  req.log.info({ req_id: req_id, route: "/ai", file: "ai-ms.js", step: "ai-ms route" }, "ai-ms route")
+  req.log.info({ route: "/ai", file: "ai-ms.js", step: "ai-ms route" }, "ai-ms route")
   console.log(`POST /api/v1/ai testing: ${is_testing}`)
 
   const count = 5
@@ -35,8 +33,8 @@ router.post('/', validateAPIKey, requestId, validateMoodBucket, validateLengthBu
     moods
   }
 
-  req.log.info({ req_id: req_id, route: "/ai", file: "ai-ms.js", req: req, step: "ai-ms: req" }, "parameters")
-  req.log.info({ req_id: req_id, route: "/ai", file: "ai-ms.js", inputParameters: inputParameters, step: "ai-ms: var: inputParameters" }, "parameters")
+  req.log.info({ route: "/ai", file: "ai-ms.js", req: req, step: "ai-ms: req" }, "parameters")
+  req.log.info({ route: "/ai", file: "ai-ms.js", inputParameters: inputParameters, step: "ai-ms: var: inputParameters" }, "parameters")
 
   const prompt = `You are a movie recommendation engine.
 
@@ -116,7 +114,7 @@ Output JSON schema EXACTLY:
   ]
 }`.trim();
 
-  req.log.info({ req_id: req_id, route: "/ai", file: "ai-ms.js", prompt: prompt, step: "ai-ms: prompt" }, "variable")
+  req.log.info({ route: "/ai", file: "ai-ms.js", prompt: prompt, step: "ai-ms: prompt" }, "variable")
 
   let data
   if (!is_testing) {
@@ -134,8 +132,7 @@ Output JSON schema EXACTLY:
           content: prompt,
         },
       ],
-    });
-
+    })
     data = chatCompletion.choices[0].message
   }
 
@@ -148,16 +145,16 @@ Output JSON schema EXACTLY:
     picked?.data ??
     picked
 
-  const sendDate = {
+  const sendData = {
     ok: true,
     testing: is_testing,
     inputParameters,
     data: pickedData
   }
-  req.log.info({ req_id: req_id, route: "/ai", file: "ai-ms.js", finalOutput: sendDate, step: "ai-ms: full huggingface response" }, "sendDate")
+  req.log.info({ route: "/ai", file: "ai-ms.js", finalOutput: sendData, step: "ai-ms: full huggingface response" }, "sendData")
 
   try {
-    res.json(sendDate)
+    res.json(sendData)
   } catch (err) {
     console.error(err)
     return next(sendError(500, "Internal server error", "INTERNAL_ERROR_MS_AI", { underlying: err.message }))

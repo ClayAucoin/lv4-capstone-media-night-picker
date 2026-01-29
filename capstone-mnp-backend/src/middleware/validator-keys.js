@@ -27,3 +27,15 @@ export function validateAIAPIKey(req, _res, next) {
   next()
 }
 
+export function validateVCAPIKey(req, res, next) {
+  // wsk = Weather Service Key
+  const vc_w_s_k = config.vc_weather_service_key
+  const wskQuery = req.query?.key
+  const wskHeaders = req.headers['x-api-key']
+
+  const isValid = wskQuery === vc_w_s_k || wskHeaders === vc_w_s_k
+  if (!wskQuery && !wskHeaders) { return next(sendError(401, "Not authorized.", "MISSING_API_TOKEN")) }
+  if (!isValid) { return next(sendError(401, "Not authorized.", "INVALID_API_TOKEN")) }
+  next()
+}
+

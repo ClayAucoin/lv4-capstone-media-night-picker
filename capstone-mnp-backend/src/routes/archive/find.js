@@ -1,7 +1,7 @@
-// src/routes/find.js
+// src/routes/archive/find.js
 
 import express from "express"
-import { sendError } from "../utils/sendError.js"
+import { sendError } from "../../utils/sendError.js"
 import { validateId } from "../middleware/validators.js"
 
 const router = express.Router()

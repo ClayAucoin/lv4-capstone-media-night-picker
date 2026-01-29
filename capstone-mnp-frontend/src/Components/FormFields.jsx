@@ -36,7 +36,7 @@ function todayLocalYYYYMMDD() {
 
 export default function FormFields() {
   const [sets, setSets] = useState([])
-  const { setResults, isTesting, useLocal, formTesting, setPayload } = useAuth()
+  const { setResults, formTesting, setPayload } = useAuth()
 
   const navigate = useNavigate()
   const [showRaw, setShowRaw] = useState(false)
@@ -44,6 +44,21 @@ export default function FormFields() {
 
   // loading state for spinner + disabling
   const [isLoading, setIsLoading] = useState(false)
+
+  const isLocalhost = ["localhost", "127.0.0.1"].includes(
+    window.location.hostname,
+  )
+  const [allowManual, setAllowManual] = useState(false)
+  const [isTesting, setIsTesting] = useState(isLocalhost)
+  const [useLocal, setUseLocal] = useState(isLocalhost)
+  const canUseDevSwitches = isLocalhost || allowManual
+
+  useEffect(() => {
+    if (!canUseDevSwitches) {
+      setIsTesting(false)
+      setUseLocal(false)
+    }
+  }, [canUseDevSwitches])
 
   // get sets from table
   const getSets = useCallback(async () => {
@@ -146,9 +161,9 @@ export default function FormFields() {
           data = { raw: text }
         }
       }
+      // console.log("data:", data)
 
       if (!response?.ok) {
-        console.log("data:", data)
         throw new Error(data?.error?.message ?? "Request failed")
       }
 
@@ -325,7 +340,6 @@ export default function FormFields() {
                   "Get Movies"
                 )}
               </button>
-
               {!isLoading && !canSubmit && (
                 <div className="form-text mt-1">
                   Fill ZIP, date, at least one mood, and length to enable.
@@ -333,22 +347,78 @@ export default function FormFields() {
               )}
             </div>
 
+            {/* admin switches start */}
+            <div className="text-center my-2">
+              {!isLocalhost && (
+                <div className="d-flex justify-content-center">
+                  <div className="align-middle form-check form-switch">
+                    <input
+                      className="form-check-input"
+                      role="switch"
+                      type="checkbox"
+                      id="allowManual"
+                      checked={allowManual}
+                      onChange={(e) => setAllowManual(e.target.checked)}
+                    />
+                    <label className="form-check-label" htmlFor="allowManual">
+                      <small>
+                        {allowManual ? "Disable" : "Enable"} dev switches on
+                        this site
+                      </small>
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              {canUseDevSwitches && (
+                <div className="d-flex justify-content-center">
+                  <div className="d-flex justify-content-evenly w-75">
+                    <div className="align-middle form-check form-switch">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="isTesting"
+                        checked={isTesting}
+                        onChange={() => setIsTesting((p) => !p)}
+                      />
+                      <label className="form-check-label" htmlFor="isTesting">
+                        <small>is testing</small>
+                      </label>
+                    </div>
+                    <div className="align-middle form-check form-switch p-1">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="useLocal"
+                        checked={useLocal}
+                        onChange={() => setUseLocal((p) => !p)}
+                      />
+                      <label className="form-check-label" htmlFor="useLocal">
+                        <small>use local services</small>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* admin switches end */}
+
             <div className="row">
               <div className="col-7">
                 {/* show sets */}
-                <div className="mt-3">
-                  <div className="form-check">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="showSets"
-                      checked={showSets}
-                      onChange={(e) => setShowSets(e.target.checked)}
-                    />
-                    <label className="form-check-label" htmlFor="showSets">
-                      Show Sets
-                    </label>
-                  </div>
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="showSets"
+                    checked={showSets}
+                    onChange={(e) => setShowSets(e.target.checked)}
+                  />
+                  <label className="form-check-label" htmlFor="showSets">
+                    Show Sets
+                  </label>
                 </div>
                 {showSets && (
                   <div className="row">
