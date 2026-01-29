@@ -1,7 +1,6 @@
 // src/routes/del.js
 
 import express from "express"
-import movies from "../data.js"
 import { validateId } from "../middleware/validators.js";
 import { sendError } from "../utils/sendError.js";
 

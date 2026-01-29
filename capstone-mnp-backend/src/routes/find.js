@@ -1,7 +1,6 @@
 // src/routes/find.js
 
 import express from "express"
-import data from "../data.js"
 import { sendError } from "../utils/sendError.js"
 import { validateId } from "../middleware/validators.js"
 

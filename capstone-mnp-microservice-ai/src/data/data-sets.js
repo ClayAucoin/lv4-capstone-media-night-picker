@@ -8,6 +8,8 @@ import dummyData5 from "./dummy-data5.js"
 import dummyData6 from "./dummy-data6.js"
 import dummyData7 from "./dummy-data7.js"
 import dummyData8 from "./dummy-data8.js"
+import dummyData9 from "./dummy-data9.js"
+import dummyData10 from "./dummy-data10.js"
 
 export const dummyDataSets = [
   dummyData1,
@@ -16,6 +18,8 @@ export const dummyDataSets = [
   dummyData4,
   dummyData5,
   dummyData6,
+  dummyData7,
+  dummyData8,
+  dummyData9,
+  dummyData10
 ]
-// dummyData7,
-// dummyData8

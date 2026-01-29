@@ -9,15 +9,11 @@ import { OpenAI } from "openai"
 
 const router = express.Router()
 
-// 'chill','funny','intense','romantic','family','uplifting','mystery','action'
-// 'CLEAR','RAIN','COLD','HOT','STORM'
-// 'LT_90','B90_120','B120_150','GT_150'
-
 // ---- POST /api/v1/ai?t=true route ----
 router.post('/', validateAPIKey, validateMoodBucket, validateLengthBucket, validateWxBucket, async (req, res, next) => {
-  console.log('POST /')
   const is_testing = parseBoolean(req.query.t)
   const local = parseBoolean(req.query.l)
+  console.log(`POST /api/v1/ai testing: ${is_testing}`)
 
   const count = 5
   const moods = req.moods
@@ -119,8 +115,8 @@ Output JSON schema EXACTLY:
     });
 
     const chatCompletion = await client.chat.completions.create({
-      // model: "openai/gpt-oss-20b:groq",
-      model: "openai/gpt-oss-120b:fireworks-ai",
+      model: "openai/gpt-oss-20b:groq",
+      // model: "openai/gpt-oss-120b:fireworks-ai",
       messages: [
         {
           role: "user",
@@ -163,12 +159,12 @@ function parseModelJson(contentString) {
     throw new Error("Model content is not a string");
   }
 
-  // Strip ```json fences if present
+  // strip ```json fences if present
   let s = contentString.trim();
   s = s.replace(/^```json\s*/i, "").replace(/^```\s*/i, "");
   s = s.replace(/```$/i, "").trim();
 
-  // If there’s extra text, try to extract the first JSON object
+  // try to extract the first JSON object if there’s extra text
   const firstBrace = s.indexOf("{");
   const lastBrace = s.lastIndexOf("}");
   if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) {

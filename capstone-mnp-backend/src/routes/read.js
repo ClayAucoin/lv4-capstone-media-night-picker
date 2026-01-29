@@ -2,7 +2,6 @@
 
 import express from "express"
 import { sendError } from "../utils/sendError.js"
-import data from "../data.js"
 
 const router = express.Router()
 

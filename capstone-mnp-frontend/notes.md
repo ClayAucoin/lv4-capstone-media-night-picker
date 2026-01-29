@@ -4,12 +4,12 @@
 
 ### Stacks
 
-| Stacks    | Port | External URL           |
-| --------- | ---- | ---------------------- |
-| frontend  | 3080 | mnp.clayaucoin.foo     |
-| backend   | 3000 | api.clayaucoin.foo     |
-| lv4cap.ai | 3105 | lv4.ai.clayaucoin.foo  |
-| weather   | 3100 | weather.clayaucoin.foo |
+| Stack Type                | PM2 Name      | Local Port | Server Port | External URL                                             |
+| ------------------------- | ------------- | :--------: | :---------: | -------------------------------------------------------- |
+| React                     | frontend-mnp  |    5173    |    3080     | [mnp.clayaucoin.foo](https://mnp.clayaucoin.foo)         |
+| Express.js                | backend-api   |    3000    |    3000     | [api.clayaucoin.foo](https://api.clayaucoin.foo)         |
+| Express.js (microservice) | ms-ai-lv4.ai  |    3105    |    3105     | [lv4.ai.clayaucoin.foo](https://lv4.ai.clayaucoin.foo)   |
+| Express.js (microservice) | ms-wx-weather |    3100    |    3100     | [weather.clayaucoin.foo](https://weather.clayaucoin.foo) |
 
 ### INSERT new set
 
