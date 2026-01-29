@@ -10,7 +10,6 @@ export function AuthProvider({ children }) {
 
   const isTesting = import.meta.env.VITE_IS_TESTING === "true"
   const formTesting = import.meta.env.VITE_FORM_TESTING === "true"
-  const displayRaw = import.meta.env.VITE_DISPLAY_RAW === "true"
 
   if (isLoading) return <p>Loading...</p>
 
@@ -23,7 +22,6 @@ export function AuthProvider({ children }) {
     formTesting,
     payload,
     setPayload,
-    displayRaw,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import { useAuth } from "../context/useAuth.js"
 import { posterFromTraktMovieSlug } from "../utils/getPoster.js"
+import posterFallback from "../assets/poster-fallback.png"
 
 function posterKeyFor(r) {
   const slug = r?.trakt_slug
@@ -19,9 +20,10 @@ function posterKeyFor(r) {
 }
 
 export default function Display() {
-  const { results, payload, displayRaw } = useAuth()
+  const { results, payload } = useAuth()
   const navigate = useNavigate()
   const [postersByImdb, setPostersByImdb] = useState({})
+  const [showRaw, setShowRaw] = useState(false)
 
   const resultDisplay = results?.data?.recommendations
 
@@ -41,7 +43,7 @@ export default function Display() {
             if (!key) return null // skip null trakt_slug
 
             const url = await posterFromTraktMovieSlug(key)
-            return [key, url ?? "../assets/poster-fallback.png"] // "/assets/poster-fallback.png"]
+            return [key, url ?? posterFallback]
           }),
         )
 
@@ -75,14 +77,13 @@ export default function Display() {
         <ul className="list-group">
           {resultDisplay?.map((result) => {
             const key = posterKeyFor(result) || `${result.title}-${result.year}`
-            const posterUrl = postersByImdb[key] || "/poster-fallback.png"
+            const posterUrl = postersByImdb[key] || posterFallback
 
             return (
               <li
                 key={key}
                 className="list-group-item list-group-item-light json-display"
               >
-                {" "}
                 <div className="row mb-2 border border-0">
                   <div className="col-2 d-flex justify-content-center align-items-center">
                     <img
@@ -109,19 +110,37 @@ export default function Display() {
             )
           })}
         </ul>
-        {/* <img src="/assets/poster-fallback.png" /> */}
       </div>
-      {displayRaw && (
+      <div className="form-check mt-0">
+        <input
+          className="form-check-input"
+          type="checkbox"
+          id="showRawJson"
+          checked={showRaw}
+          onChange={(e) => setShowRaw(e.target.checked)}
+        />
+        <label className="form-check-label" htmlFor="showRawJson">
+          Show raw JSON
+        </label>
+      </div>
+      {showRaw && payload && resultDisplay && (
         <div>
-          <h6>
-            <small>payload</small>
-          </h6>
-          <pre className="signature-display">
-            {payload ? JSON.stringify(payload, null, 2) : ""}
-          </pre>
-          <pre className="signature-display">
-            {resultDisplay ? JSON.stringify(resultDisplay, null, 2) : ""}
-          </pre>
+          <div className=" mt-3 p-3 bg-light border rounded">
+            <h6>
+              <small>payload</small>
+            </h6>
+            <pre className="signature-display">
+              {payload ? JSON.stringify(payload, null, 2) : ""}
+            </pre>
+          </div>
+          <div className=" mt-3 p-3 bg-light border rounded">
+            <h6>
+              <small>movie data</small>
+            </h6>
+            <pre className="signature-display">
+              {resultDisplay ? JSON.stringify(resultDisplay, null, 2) : ""}
+            </pre>
+          </div>
         </div>
       )}
     </div>

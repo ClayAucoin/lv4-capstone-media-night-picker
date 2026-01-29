@@ -36,16 +36,11 @@ function todayLocalYYYYMMDD() {
 
 export default function FormFields() {
   const [sets, setSets] = useState([])
-  const {
-    results,
-    setResults,
-    isTesting,
-    formTesting,
-    setPayload,
-    displayRaw,
-  } = useAuth()
+  const { setResults, isTesting, formTesting, setPayload } = useAuth()
 
   const navigate = useNavigate()
+  const [showRaw, setShowRaw] = useState(false)
+  const [showSets, setShowSets] = useState(false)
 
   // loading state for spinner + disabling
   const [isLoading, setIsLoading] = useState(false)
@@ -91,7 +86,7 @@ export default function FormFields() {
 
   function toggleMood(value) {
     setSelectedMoods((prev) =>
-      prev.includes(value) ? prev.filter((m) => m !== value) : [...prev, value]
+      prev.includes(value) ? prev.filter((m) => m !== value) : [...prev, value],
     )
   }
 
@@ -181,7 +176,7 @@ export default function FormFields() {
 
       <div className="container py-3" style={{ maxWidth: 1000 }}>
         <div className="row">
-          <div className="col-8">
+          <div className="col">
             {/* zip */}
             <div className="mb-3">
               <label htmlFor="zip" className="form-label">
@@ -329,38 +324,69 @@ export default function FormFields() {
               )}
             </div>
 
-            {/* json output */}
-            <pre className="bg-light p-2 rounded small">
-              <small>
-                {JSON.stringify(
-                  { zip, date, length, moods: selectedMoods },
-                  null,
-                  2
+            <div className="row">
+              <div className="col-7">
+                {/* show sets */}
+                <div className="mt-3">
+                  <div className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="showSets"
+                      checked={showSets}
+                      onChange={(e) => setShowSets(e.target.checked)}
+                    />
+                    <label className="form-check-label" htmlFor="showSets">
+                      Show Sets
+                    </label>
+                  </div>
+                </div>
+                {showSets && (
+                  <div className="row">
+                    <div>
+                      <ul>
+                        {sets.length === 0 ? (
+                          <p>No sets yet.</p>
+                        ) : (
+                          sets.map((set) => (
+                            <li key={set.id} className="signature-display">
+                              {normalizeMoods(set.moods)}, {set.length_bucket},{" "}
+                              {set.weather_bucket}
+                            </li>
+                          ))
+                        )}
+                      </ul>
+                    </div>
+                  </div>
                 )}
-              </small>
-            </pre>
-            {displayRaw && (
-              <div>
-                <pre className="json-display">
-                  {results ? JSON.stringify(results, null, 2) : ""}
-                </pre>
               </div>
-            )}
-          </div>
-          <div className="col-4">
-            <div>
-              <ul>
-                {sets.length === 0 ? (
-                  <p>No sets yet.</p>
-                ) : (
-                  sets.map((set) => (
-                    <li key={set.id} className="signature-display">
-                      {normalizeMoods(set.moods)}, {set.length_bucket},{" "}
-                      {set.weather_bucket}
-                    </li>
-                  ))
+              <div className="col-5">
+                {/* show json */}
+                <div className="form-check mt-0">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="showRawJson"
+                    checked={showRaw}
+                    onChange={(e) => setShowRaw(e.target.checked)}
+                  />
+                  <label className="form-check-label" htmlFor="showRawJson">
+                    Show raw JSON
+                  </label>
+                </div>
+
+                {showRaw && (
+                  <pre className="bg-light p-2 rounded small">
+                    <small>
+                      {JSON.stringify(
+                        { zip, date, length, moods: selectedMoods },
+                        null,
+                        2,
+                      )}
+                    </small>
+                  </pre>
                 )}
-              </ul>
+              </div>
             </div>
           </div>
         </div>
