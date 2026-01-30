@@ -71,7 +71,7 @@ router.post("/submit", validateAPIKey, requestId, async (req, res, next) => {
     req.log.info({ req_id: REQ_ID, route: "/submit", file: "core.js", data_ai: aiResponse, step: "bk-core: getAiSuggestions success" }, "function response")
     req.log.info({ req_id: REQ_ID, route: "/submit", file: "core.js", AI_URL: AI_URL, step: "bk-core: AI_URL" }, "URL")
 
-    console.log("aiResponse:", aiResponse)
+    // console.log("aiResponse:", aiResponse)
 
     addPayload = {
       "ok": true,
@@ -93,7 +93,7 @@ router.post("/submit", validateAPIKey, requestId, async (req, res, next) => {
 
     sendData = await addAiSuggestions(addPayload, isTesting, useLocal)
 
-    console.log("aft addAiSuggestions:", sendData)
+    // console.log("aft addAiSuggestions:", sendData)
   } else {
     // get existing data
     const { data: recs_data, error: recs_err } = await supabase
@@ -183,7 +183,7 @@ async function addAiSuggestions(addPayload, isTesting = true, useLocal = true) {
   }
   const apiHeader = config.ai_api_key
 
-  console.log("baseUrl:", ADD_AI_URL)
+  // console.log("baseUrl:", ADD_AI_URL)
 
   const response = await fetch(ADD_AI_URL, {
     method: "POST",

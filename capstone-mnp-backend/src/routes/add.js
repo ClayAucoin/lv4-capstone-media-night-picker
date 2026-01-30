@@ -77,7 +77,7 @@ router.post("/add", requestId, async (req, res, next) => {
       recommendations: rec_data_out
     }
   }
-  console.log("sendData:", sendData)
+  // console.log("sendData:", sendData)
 
   req.log.info({ req_id: req_id, route: "/add", file: "add.js", sendData: sendData, message: message, step: "add: sendData" }, "sendData")
   res.status(201).json(sendData)
