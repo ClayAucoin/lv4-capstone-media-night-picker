@@ -37,7 +37,15 @@ function todayLocalYYYYMMDD() {
 
 export default function FormFields() {
   const [sets, setSets] = useState([])
-  const { setResults, formTesting, setPayload } = useAuth()
+  const {
+    setResults,
+    formTesting,
+    setPayload,
+    isTesting,
+    useLocal,
+    setIsTesting,
+    isLocalhost,
+  } = useAuth()
 
   const navigate = useNavigate()
   const [showRaw, setShowRaw] = useState(false)
@@ -46,17 +54,19 @@ export default function FormFields() {
   // loading state for spinner + disabling
   const [isLoading, setIsLoading] = useState(false)
 
-  // check if localhost or remote
-  const isLocalhost = ["localhost", "127.0.0.1"].includes(
-    window.location.hostname,
-  )
-  const [isTesting, setIsTesting] = useState(isLocalhost)
-  const [useLocal, setUseLocal] = useState(isLocalhost)
+  // // check if localhost or remote
+  // const isLocalhost = ["localhost", "127.0.0.1"].includes(
+  //   window.location.hostname,
+  // )
+  // const [isTesting, setIsTesting] = useState(isLocalhost)
+  // const [useLocal, setUseLocal] = useState(isLocalhost)
 
-  useEffect(() => {
-    setIsTesting(false)
-    setUseLocal(false)
-  }, [])
+  // useEffect(() => {
+  //   setIsTesting(true)
+  //   setUseLocal(true)
+  // }, [])
+
+  console.log("form:t:", isTesting, "l:", useLocal)
 
   // get sets from table
   const getSets = useCallback(async () => {

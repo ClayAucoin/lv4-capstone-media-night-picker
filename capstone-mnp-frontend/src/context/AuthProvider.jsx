@@ -11,8 +11,26 @@ export function AuthProvider({ children }) {
   const formTesting = import.meta.env.VITE_FORM_TESTING === "true"
 
   const params = new URLSearchParams(window.location.search)
-  const isTesting = params.get("t") === "true"
-  const useLocal = params.get("l") === "true"
+  const tParam = params.get("t")
+  const lParam = params.get("l")
+
+  // check if localhost or remote
+  const isLocalhost = ["localhost", "127.0.0.1"].includes(
+    window.location.hostname,
+  )
+
+  const t = tParam === "true" ? true : tParam === "false" ? false : null
+  const l = lParam === "true" ? true : lParam === "false" ? false : null
+
+  const [isTesting, setIsTesting] = useState(
+    () => t === true || (t === null && isLocalhost),
+  )
+  const [useLocal, setUseLocal] = useState(
+    () => l === true || (l === null && isLocalhost),
+  )
+
+  console.log("isLocalhost:", isLocalhost)
+  console.log("auth: t:", isTesting, "l:", useLocal)
 
   if (isLoading) return <p>Loading...</p>
 
@@ -22,10 +40,13 @@ export function AuthProvider({ children }) {
     isLoading,
     setIsLoading,
     isTesting,
+    setIsTesting,
     useLocal,
+    setUseLocal,
     formTesting,
     payload,
     setPayload,
+    isLocalhost,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
