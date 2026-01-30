@@ -13,11 +13,11 @@ const router = express.Router()
 
 // ---- POST /api/v1/ai?t=true route ----
 router.post('/', validateAPIKey, requestId, validateMoodBucket, validateLengthBucket, validateWxBucket, async (req, res, next) => {
-  const is_testing = parseBoolean(req.query.t)
+  const isTesting = parseBoolean(req.query.t)
+  const useLocal = parseBoolean(req.query.l)
 
   const req_id = req.req_id
-  req.log.info({ route: "/ai", file: "ai-ms.js", step: "ai-ms route" }, "ai-ms route")
-  console.log(`POST /api/v1/ai testing: ${is_testing}`)
+  console.log(`POST /api/v1/ai testing: ${isTesting}`)
 
   const count = 5
   const moods = req.moods
@@ -33,8 +33,8 @@ router.post('/', validateAPIKey, requestId, validateMoodBucket, validateLengthBu
     moods
   }
 
-  req.log.info({ route: "/ai", file: "ai-ms.js", req: req, step: "ai-ms: req" }, "parameters")
-  req.log.info({ route: "/ai", file: "ai-ms.js", inputParameters: inputParameters, step: "ai-ms: var: inputParameters" }, "parameters")
+  req.log.info({ req_id: req_id, route: "/ai", file: "ai-ms.js", req: req, step: "ai-ms: req" }, "parameters")
+  req.log.info({ req_id: req_id, route: "/ai", file: "ai-ms.js", inputParameters: inputParameters, step: "ai-ms: var: inputParameters" }, "inputParameters")
 
   const prompt = `You are a movie recommendation engine.
 
@@ -114,10 +114,10 @@ Output JSON schema EXACTLY:
   ]
 }`.trim();
 
-  req.log.info({ route: "/ai", file: "ai-ms.js", prompt: prompt, step: "ai-ms: prompt" }, "variable")
+  req.log.info({ req_id: req_id, route: "/ai", file: "ai-ms.js", prompt: prompt, step: "ai-ms: prompt" }, "prompt")
 
   let data
-  if (!is_testing) {
+  if (!isTesting) {
     const client = new OpenAI({
       baseURL: "https://router.huggingface.co/v1",
       apiKey: process.env.HF_TOKEN,
@@ -136,7 +136,7 @@ Output JSON schema EXACTLY:
     data = chatCompletion.choices[0].message
   }
 
-  const picked = is_testing
+  const picked = isTesting
     ? dummyDataSets[randomInt(0, dummyDataSets.length - 1)]
     : parseModelJson(data.content)
 
@@ -147,11 +147,12 @@ Output JSON schema EXACTLY:
 
   const sendData = {
     ok: true,
-    testing: is_testing,
+    isTesting: isTesting,
+    useLocal,
     inputParameters,
     data: pickedData
   }
-  req.log.info({ route: "/ai", file: "ai-ms.js", finalOutput: sendData, step: "ai-ms: full huggingface response" }, "sendData")
+  req.log.info({ req_id: req_id, route: "/ai", file: "ai-ms.js", finalOutput: sendData, step: "ai-ms: full huggingface response" }, "sendData")
 
   try {
     res.json(sendData)

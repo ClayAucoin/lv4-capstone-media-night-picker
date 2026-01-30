@@ -15,12 +15,12 @@ const RECOMMENDATIONS_TABLE = "lv4_cap_recommendations"
 router.post("/add", requestId, async (req, res, next) => {
   const req_id = req.req_id
   const useLocal = parseBoolean(req.query.l)
-  const is_testing = parseBoolean(req.query.t)
+  const isTesting = parseBoolean(req.query.t)
   const newItem = req.body
 
-  console.log(`POST /add testing: ${is_testing}, local: ${useLocal}`)
+  console.log(`POST /add testing: ${isTesting}, local: ${useLocal}`)
 
-  req.log.info({ route: "/add", file: "add.js", req_body: newItem, step: "bk-add route, req.body" }, "parameters")
+  req.log.info({ req_id: req_id, route: "/add", file: "add.js", req_body: newItem, step: "bk-add route, req.body" }, "parameters")
 
   const inputParameters = newItem.inputParameters
   const incomingRecommendations = newItem.data.recommendations
@@ -32,12 +32,10 @@ router.post("/add", requestId, async (req, res, next) => {
     moods: inputParameters.moods,
     prompt_version: inputParameters.prompt_version,
     variant: "default",
-    req_id: inputParameters.req_id,
-    is_testing: inputParameters.is_testing,
-    is_useLocal: inputParameters.useLocal,
-    inputParameters
+    inputParameters,
+    req_id: req_id,
   }
-  req.log.info({ route: "/add", file: "add.js", setsPayload: setsPayload, step: "bk-add setsPayload" }, "variable")
+  req.log.info({ req_id: req_id, route: "/add", file: "add.js", setsPayload: setsPayload, step: "bk-add setsPayload" }, "setsPayload")
 
   let newPayload, recommendations_data_out, message
 
@@ -51,7 +49,7 @@ router.post("/add", requestId, async (req, res, next) => {
   if (ins_err) return next(sendError(500, "Failed to add sets data", "INSERT_ERROR", { underlying: ins_err.message }))
 
   message = "Recommendation set added."
-  req.log.info({ route: "/add", file: "add.js", sets_data: sets_data, step: "bk-add: recommendation set added" }, "DB_ADD")
+  req.log.info({ req_id: req_id, route: "/add", file: "add.js", sets_data: sets_data, step: "bk-add: recommendation set added" }, "DB_ADD")
 
   // build new payload with set id added
   newPayload = buildRecoInsertRows(incomingRecommendations, sets_data.id)
@@ -66,18 +64,22 @@ router.post("/add", requestId, async (req, res, next) => {
 
   message = message + " Recommendations added successfully."
   recommendations_data_out = recommendations_data
-  req.log.info({ route: "/add", file: "add.js", recommendations_data: recommendations_data, step: "bk-add: recommendations added successfully" }, "DB_ADD")
+  req.log.info({ req_id: req_id, route: "/add", file: "add.js", recommendations_data: recommendations_data, step: "bk-add: recommendations added successfully" }, "DB_ADD")
 
   const sendData = {
     ok: true,
+    req_id,
+    isTesting: isTesting,
+    useLocal,
     records: recommendations_data_out.length,
-    message: message,
+    message,
     data: {
       recommendations: recommendations_data_out
     }
   }
+  console.log("semdData:", sendData)
 
-  req.log.info({ route: "/add", file: "add.js", sendData: sendData, message: message, step: "add: sendData" }, "sendData")
+  req.log.info({ req_id: req_id, route: "/add", file: "add.js", sendData: sendData, message: message, step: "add: sendData" }, "sendData")
   res.status(201).json(sendData)
 })
 

@@ -12,19 +12,19 @@ const router = express.Router()
 
 router.post("/ai", requestId, validateAIAPIKey, validateMoodBucket, validateLengthBucket, validateWxBucket, async (req, res, next) => {
   const req_id = req.req_id
-  const is_testing = parseBoolean(req.query.t)
+  const isTesting = parseBoolean(req.query.t)
   const useLocal = parseBoolean(req.query.l)
 
   let baseUrl
   let where
   if (!useLocal) {
-    baseUrl = `https://lv4.ai.clayaucoin.foo/api/v1/ai?t=${is_testing}&l=${useLocal}`
+    baseUrl = `https://lv4.ai.clayaucoin.foo/api/v1/ai?t=${isTesting}&l=${useLocal}`
     where = "online"
   } else {
-    baseUrl = `http://localhost:3105/api/v1/ai?t=${is_testing}&l=${useLocal}`
+    baseUrl = `http://localhost:3105/api/v1/ai?t=${isTesting}&l=${useLocal}`
     where = "useLocal"
   }
-  req.log.info({ route: "/ai", file: "read-ai.js", baseUrl: baseUrl, step: "bk-ai: baseUrl" }, "variable")
+  req.log.info({ req_id: req_id, route: "/ai", file: "read-ai.js", baseUrl: baseUrl, step: "bk-ai: baseUrl" }, "baseUrl")
 
   const apiHeader = config.ai_api_key
   const moods = req.moods
@@ -45,15 +45,15 @@ router.post("/ai", requestId, validateAIAPIKey, validateMoodBucket, validateLeng
     }),
   })
   const data = await response.json()
-  console.log(`POST /ai testing: ${is_testing}, local: ${useLocal}`)
+  console.log(`POST /ai testing: ${isTesting}, local: ${useLocal}`)
 
   const sendData = {
     ok: true,
-    testing: is_testing,
+    isTesting: isTesting,
     where: where,
     data: data,
   }
-  req.log.info({ route: "/ai", file: "read-ai.js", sendData: sendData, step: "bk-ai: sendData" }, "variable")
+  req.log.info({ req_id: req_id, route: "/ai", file: "read-ai.js", sendData: sendData, step: "bk-ai: sendData" }, "sendData")
 
   res.status(200).json(sendData)
   // } catch (err) {

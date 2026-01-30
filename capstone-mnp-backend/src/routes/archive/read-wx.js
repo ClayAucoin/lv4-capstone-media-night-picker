@@ -50,7 +50,7 @@ router.post("/wx", requestId, validateWxAPIKey, validateWeatherVars, async (req,
       conditions: data.conditions
     }
 
-    req.log.info({ req_id: req_id, route: "/wx", file: "read-ws.js", sendData: sendData, step: "bk-wx: sendData" }, "variable")
+    req.log.info({ req_id: req_id, route: "/wx", file: "read-ws.js", sendData: sendData, step: "bk-wx: sendData" }, "sendData")
 
     res.status(200).json(sendData)
   } catch (err) {

@@ -41,9 +41,9 @@ export function validateMoodBucket(req, _res, next) {
   try {
     const raw = req.body?.moods
 
-    const is_testing = parseBoolean(req.query.t)
+    const isTesting = parseBoolean(req.query.t)
 
-    if (!is_testing) {
+    if (!isTesting) {
       if (raw == null || String(raw).trim() === "") {
         return next(sendError(
           400,
@@ -82,9 +82,9 @@ export function validateLengthBucket(req, _res, next) {
   try {
     const raw = req.body?.len_bkt
 
-    const is_testing = parseBoolean(req.query.t)
+    const isTesting = parseBoolean(req.query.t)
 
-    if (!is_testing) {
+    if (!isTesting) {
       if (raw == null || String(raw).trim() === "") {
         return next(sendError(
           400,
@@ -120,9 +120,9 @@ export function validateWxBucket(req, _res, next) {
   try {
     const raw = req.body?.wx_bkt
 
-    const is_testing = parseBoolean(req.query.t)
+    const isTesting = parseBoolean(req.query.t)
 
-    if (!is_testing) {
+    if (!isTesting) {
       if (raw == null || String(raw).trim() === "") {
         return next(sendError(
           400,

@@ -140,6 +140,7 @@ export default function FormFields() {
 
       const reqId = crypto.randomUUID()
       console.log("reqId:", reqId)
+      console.log("t:", isTesting, "l:", useLocal)
 
       const response = await fetch(baseUrl, {
         method: "POST",
