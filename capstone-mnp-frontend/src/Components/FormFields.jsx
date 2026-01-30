@@ -6,6 +6,7 @@ const WX_CONDITION = "Rain, Partially cloudy"
 import { useState, useEffect, useCallback } from "react"
 import { useNavigate, Link, Navigate } from "react-router-dom"
 import { useAuth } from "../context/useAuth.js"
+import { normalizeMoods } from "../utils/helpers.js"
 import supabase from "../utils/supabase.js"
 
 const MOODS = [
@@ -45,20 +46,17 @@ export default function FormFields() {
   // loading state for spinner + disabling
   const [isLoading, setIsLoading] = useState(false)
 
+  // check if localhost or remote
   const isLocalhost = ["localhost", "127.0.0.1"].includes(
     window.location.hostname,
   )
-  const [allowManual, setAllowManual] = useState(false)
   const [isTesting, setIsTesting] = useState(isLocalhost)
   const [useLocal, setUseLocal] = useState(isLocalhost)
-  const canUseDevSwitches = isLocalhost || allowManual
 
   useEffect(() => {
-    if (!canUseDevSwitches) {
-      setIsTesting(false)
-      setUseLocal(false)
-    }
-  }, [canUseDevSwitches])
+    setIsTesting(false)
+    setUseLocal(false)
+  }, [])
 
   // get sets from table
   const getSets = useCallback(async () => {
@@ -132,11 +130,10 @@ export default function FormFields() {
 
       let baseUrl
       if (!useLocal) {
-        baseUrl = `https://api.clayaucoin.foo/api/v1/submit?t=${isTesting}&l=${useLocal}`
+        baseUrl = `https://api.clayaucoin.foo/api/v1/core?t=${isTesting}&l=${useLocal}`
       } else {
-        baseUrl = `http://localhost:3000/api/v1/submit?t=${isTesting}&l=${useLocal}`
+        baseUrl = `http://localhost:3000/api/v1/core?t=${isTesting}&l=${useLocal}`
       }
-      // console.log("baseUrl:", baseUrl)
 
       const reqId = crypto.randomUUID()
       console.log("reqId:", reqId)
@@ -178,9 +175,14 @@ export default function FormFields() {
     }
   }
 
+  function zipValidation(e) {
+    const digitsOnly = e.target.value.replace(/\D/g, "").slice(0, 5)
+    setZip(digitsOnly)
+  }
+
   return (
     <>
-      {/* bootstrap spinner overlay */}
+      {/* start bootstrap spinner overlay */}
       {isLoading && (
         <div
           className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
@@ -198,6 +200,7 @@ export default function FormFields() {
           </div>
         </div>
       )}
+      {/* end bootstrap spinner overlay */}
 
       <div className="container py-3" style={{ maxWidth: 1000 }}>
         <div className="row">
@@ -219,12 +222,7 @@ export default function FormFields() {
                 placeholder="ZIP code (e.g., 70112)"
                 value={zip}
                 disabled={isLoading}
-                onChange={(e) => {
-                  const digitsOnly = e.target.value
-                    .replace(/\D/g, "")
-                    .slice(0, 5)
-                  setZip(digitsOnly)
-                }}
+                onChange={(e) => zipValidation(e)}
               />
 
               <div className="form-text">
@@ -323,7 +321,7 @@ export default function FormFields() {
 
             <div className="text-center mb-2">
               <button
-                className="btn btn-primary btn-sm"
+                className="btn btn-primary btn-lg"
                 type="button"
                 onClick={handleSubmit}
                 disabled={submitDisabled}
@@ -349,125 +347,93 @@ export default function FormFields() {
             </div>
 
             {/* admin switches start */}
-            <div className="text-center my-2">
-              {!isLocalhost && (
-                <div className="d-flex justify-content-center">
-                  <div className="align-middle form-check form-switch">
-                    <input
-                      className="form-check-input"
-                      role="switch"
-                      type="checkbox"
-                      id="allowManual"
-                      checked={allowManual}
-                      onChange={(e) => setAllowManual(e.target.checked)}
-                    />
-                    <label className="form-check-label" htmlFor="allowManual">
-                      <small>
-                        {allowManual ? "Disable" : "Enable"} dev switches on
-                        this site
-                      </small>
-                    </label>
+            {isLocalhost && (
+              <div>
+                <div className="text-center my-2">
+                  <div className="d-flex justify-content-center">
+                    <div className="d-flex justify-content-evenly w-75">
+                      <div className="align-middle form-check form-switch">
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          role="switch"
+                          id="isTesting"
+                          checked={isTesting}
+                          onChange={() => setIsTesting((p) => !p)}
+                        />
+                        <label className="form-check-label" htmlFor="isTesting">
+                          <small>is testing</small>
+                        </label>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              )}
+                {/* admin switches end */}
 
-              {canUseDevSwitches && (
-                <div className="d-flex justify-content-center">
-                  <div className="d-flex justify-content-evenly w-75">
-                    <div className="align-middle form-check form-switch">
+                <div className="row">
+                  <div className="col-7">
+                    {/* show sets */}
+                    <div className="form-check">
                       <input
                         className="form-check-input"
                         type="checkbox"
-                        role="switch"
-                        id="isTesting"
-                        checked={isTesting}
-                        onChange={() => setIsTesting((p) => !p)}
+                        id="showSets"
+                        checked={showSets}
+                        onChange={(e) => setShowSets(e.target.checked)}
                       />
-                      <label className="form-check-label" htmlFor="isTesting">
-                        <small>is testing</small>
+                      <label className="form-check-label" htmlFor="showSets">
+                        Show Sets
                       </label>
                     </div>
-                    <div className="align-middle form-check form-switch p-1">
+                    {showSets && (
+                      <div className="row">
+                        <div>
+                          <ul>
+                            {sets.length === 0 ? (
+                              <p>No sets yet.</p>
+                            ) : (
+                              sets.map((set) => (
+                                <li key={set.id} className="signature-display">
+                                  {normalizeMoods(set.moods)},{" "}
+                                  {set.length_bucket}, {set.weather_bucket}
+                                </li>
+                              ))
+                            )}
+                          </ul>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="col-5">
+                    {/* show json */}
+                    <div className="form-check mt-0">
                       <input
                         className="form-check-input"
                         type="checkbox"
-                        role="switch"
-                        id="useLocal"
-                        checked={useLocal}
-                        onChange={() => setUseLocal((p) => !p)}
+                        id="showRawJson"
+                        checked={showRaw}
+                        onChange={(e) => setShowRaw(e.target.checked)}
                       />
-                      <label className="form-check-label" htmlFor="useLocal">
-                        <small>use local services</small>
+                      <label className="form-check-label" htmlFor="showRawJson">
+                        Show raw JSON
                       </label>
                     </div>
+
+                    {showRaw && (
+                      <pre className="bg-light p-2 rounded small">
+                        <small>
+                          {JSON.stringify(
+                            { zip, date, length, moods: selectedMoods },
+                            null,
+                            2,
+                          )}
+                        </small>
+                      </pre>
+                    )}
                   </div>
                 </div>
-              )}
-            </div>
-            {/* admin switches end */}
-
-            <div className="row">
-              <div className="col-7">
-                {/* show sets */}
-                <div className="form-check">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="showSets"
-                    checked={showSets}
-                    onChange={(e) => setShowSets(e.target.checked)}
-                  />
-                  <label className="form-check-label" htmlFor="showSets">
-                    Show Sets
-                  </label>
-                </div>
-                {showSets && (
-                  <div className="row">
-                    <div>
-                      <ul>
-                        {sets.length === 0 ? (
-                          <p>No sets yet.</p>
-                        ) : (
-                          sets.map((set) => (
-                            <li key={set.id} className="signature-display">
-                              {normalizeMoods(set.moods)}, {set.length_bucket},{" "}
-                              {set.weather_bucket}
-                            </li>
-                          ))
-                        )}
-                      </ul>
-                    </div>
-                  </div>
-                )}
               </div>
-              <div className="col-5">
-                {/* show json */}
-                <div className="form-check mt-0">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="showRawJson"
-                    checked={showRaw}
-                    onChange={(e) => setShowRaw(e.target.checked)}
-                  />
-                  <label className="form-check-label" htmlFor="showRawJson">
-                    Show raw JSON
-                  </label>
-                </div>
-
-                {showRaw && (
-                  <pre className="bg-light p-2 rounded small">
-                    <small>
-                      {JSON.stringify(
-                        { zip, date, length, moods: selectedMoods },
-                        null,
-                        2,
-                      )}
-                    </small>
-                  </pre>
-                )}
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -475,10 +441,10 @@ export default function FormFields() {
   )
 }
 
-// format moods for signature
-function normalizeMoods(moods = []) {
-  return moods
-    .map((m) => m.toLowerCase().trim())
-    .sort()
-    .join(",")
-}
+// // format moods for signature
+// function normalizeMoods(moods = []) {
+//   return moods
+//     .map((m) => m.toLowerCase().trim())
+//     .sort()
+//     .join(",")
+// }

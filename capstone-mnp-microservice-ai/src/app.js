@@ -34,7 +34,7 @@ app.use(
 
 // use routes
 app.use("/", rootRouter)
-app.use("/api/v1/ai", itemsRouter)
+app.use("/api/v1/", itemsRouter)
 
 
 // check for malformed JSON

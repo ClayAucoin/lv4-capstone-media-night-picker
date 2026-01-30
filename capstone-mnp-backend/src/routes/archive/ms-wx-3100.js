@@ -1,12 +1,13 @@
-// src/routes/read.js
+// src/routes/ms-wx-3100.js
+// MOVED BACK TO 3100
 
 import express from "express"
-import { validateVCAPIKey } from "../middleware/validator-keys.js"
-import { validateWeatherVars } from "../middleware/validator-wx.js"
-import { parseBoolean } from "../utils/helpers.js"
-import { requestId } from "../middleware/requestId.js"
-import { config } from "../config.js"
-import { sendError } from "../utils/sendError.js"
+import { validateVCAPIKey } from "../../middleware/validator-keys.js"
+import { validateWeatherVars } from "../../middleware/validator-wx.js"
+import { parseBoolean } from "../../utils/helpers.js"
+import { requestId } from "../../middleware/requestId.js"
+import { config } from "../../config.js"
+import { sendError } from "../../utils/sendError.js"
 
 const router = express.Router()
 

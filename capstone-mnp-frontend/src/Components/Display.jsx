@@ -95,10 +95,10 @@ export default function Display() {
 
                   <div className="col-10">
                     <h1 className="fs-5 fw-semibold inline-block">
-                      {result.title}
+                      {result.title}{" "}
                     </h1>
                     <h3 className="fs-5 fw-semibold text-muted inline-block">
-                      <small> ({result.year})</small>
+                      <small>({result.year})</small>
                     </h3>
                     <br />
                     <ul>

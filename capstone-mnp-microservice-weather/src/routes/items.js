@@ -3,10 +3,10 @@
 import express from "express";
 
 // routes
-import readRouter from "./wx-ms.js"
+import msWxRouter from "./ms-wx.js"
 
 const itemsRouter = express.Router()
 
-itemsRouter.use("/", readRouter)      // POST /items/
+itemsRouter.use("/", msWxRouter)      // POST /items/
 
 export default itemsRouter

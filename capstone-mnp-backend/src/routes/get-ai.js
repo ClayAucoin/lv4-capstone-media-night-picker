@@ -1,12 +1,12 @@
-// src/routes/read-ai.js
+// src/routes/get-ai.js
 
 import express from "express"
-import { sendError } from "../../utils/sendError.js"
-import { validateAIAPIKey } from "../../middleware/validator-keys.js"
-import { validateMoodBucket, validateLengthBucket, validateWxBucket } from "../../middleware/validator-ai.js"
-import { parseBoolean } from '../../utils/helpers.js'
-import { requestId } from "../../middleware/requestId.js"
-import { config } from "../../config.js"
+import { sendError } from "../utils/sendError.js"
+import { validateAIAPIKey } from "../middleware/validator-keys.js"
+import { validateMoodBucket, validateLengthBucket, validateWxBucket } from "../middleware/validator-ai.js"
+import { parseBoolean } from '../utils/helpers.js'
+import { requestId } from "../middleware/requestId.js"
+import { config } from "../config.js"
 
 const router = express.Router()
 
@@ -16,15 +16,17 @@ router.post("/ai", requestId, validateAIAPIKey, validateMoodBucket, validateLeng
   const useLocal = parseBoolean(req.query.l)
 
   let baseUrl
-  let where
-  if (!useLocal) {
-    baseUrl = `https://lv4.ai.clayaucoin.foo/api/v1/ai?t=${isTesting}&l=${useLocal}`
-    where = "online"
-  } else {
-    baseUrl = `http://localhost:3105/api/v1/ai?t=${isTesting}&l=${useLocal}`
-    where = "useLocal"
-  }
-  req.log.info({ req_id: req_id, route: "/ai", file: "read-ai.js", baseUrl: baseUrl, step: "bk-ai: baseUrl" }, "baseUrl")
+  // let where
+  // if (!useLocal) {
+  //   baseUrl = `https://lv4.ai.clayaucoin.foo/api/v1/ai?t=${isTesting}&l=${useLocal}`
+  //   where = "online"
+  // } else {
+
+  baseUrl = `http://localhost:3105/api/v1/ai?t=${isTesting}&l=${useLocal}`
+
+  //   where = "useLocal"
+  // }
+  req.log.info({ req_id: req_id, route: "/ai", file: "get-ai.js", baseUrl: baseUrl, step: "bk-ai: baseUrl" }, "baseUrl")
 
   const apiHeader = config.ai_api_key
   const moods = req.moods
@@ -50,10 +52,10 @@ router.post("/ai", requestId, validateAIAPIKey, validateMoodBucket, validateLeng
   const sendData = {
     ok: true,
     isTesting: isTesting,
-    where: where,
+    // where: where,
     data: data,
   }
-  req.log.info({ req_id: req_id, route: "/ai", file: "read-ai.js", sendData: sendData, step: "bk-ai: sendData" }, "sendData")
+  req.log.info({ req_id: req_id, route: "/ai", file: "get-ai.js", sendData: sendData, step: "bk-ai: sendData" }, "sendData")
 
   res.status(200).json(sendData)
   // } catch (err) {

@@ -34,7 +34,6 @@ app.use(
 app.use("/", rootRouter)
 app.use("/api/v1", itemsRouter)
 
-
 export function globalErrorHandler(err, req, res, next) {
   const status = err.status || 500
 

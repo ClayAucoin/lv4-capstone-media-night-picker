@@ -3,10 +3,10 @@
 import express from "express";
 
 // routes
-import readRouter from "./ai-ms.js"
+import msAiRouter from "./ms-ai.js"
 
 const itemsRouter = express.Router()
 
-itemsRouter.use("/", readRouter)      // GET /items/
+itemsRouter.use("/", msAiRouter)      // GET /items/
 
 export default itemsRouter

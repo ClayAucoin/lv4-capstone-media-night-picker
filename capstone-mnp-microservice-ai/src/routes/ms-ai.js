@@ -1,7 +1,8 @@
 // src/routes/read.js
 
 import express from "express"
-import { validateAPIKey, validateMoodBucket, validateLengthBucket, validateWxBucket } from "../middleware/validator-ai.js"
+import { validateMoodBucket, validateLengthBucket, validateWxBucket } from "../middleware/validator-ai.js"
+import { validateAIAPIKey } from "../middleware/validator-keys.js"
 import { parseModelJson, parseBoolean, randomInt } from "../utils/helpers.js"
 import { buildMoviePrompt } from "../prompts/aiPrompt.js"
 import { requestId } from "../middleware/requestId.js"
@@ -13,7 +14,7 @@ import { OpenAI } from "openai"
 const router = express.Router()
 
 // ---- POST /api/v1/ai?t=true route ----
-router.post('/ai', validateAPIKey, requestId, validateMoodBucket, validateLengthBucket, validateWxBucket, async (req, res, next) => {
+router.post('/ai', validateAIAPIKey, requestId, validateMoodBucket, validateLengthBucket, validateWxBucket, async (req, res, next) => {
   const isTesting = parseBoolean(req.query.t)
   const useLocal = parseBoolean(req.query.l)
 
