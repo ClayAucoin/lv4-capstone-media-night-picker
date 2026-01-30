@@ -4,6 +4,7 @@ import express from "express";
 
 // routes
 import weatherRouter from "./ms-wx.js"
+// import msAIRouterOLD from "./ms-ai-OLD.js"
 import msAIRouter from "./ms-ai.js"
 import coreRouter from "./core.js"
 import addRouter from "./add.js"

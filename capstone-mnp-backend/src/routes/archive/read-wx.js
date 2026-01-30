@@ -41,7 +41,7 @@ router.post("/wx", requestId, validateWxAPIKey, validateWeatherVars, async (req,
     })
     const data = await response.json()
     console.log("POST /read-wx")
-    req.log.info({ req_id: req_id, route: "/wx", file: "read-ws.js", data: data, step: "bk-wx: datafrom resposne" }, "fetch response")
+    req.log.info({ req_id: req_id, route: "/wx", file: "read-ws.js", data: data, step: "bk-wx: data from response" }, "fetch response")
 
     const sendData = {
       ok: true,

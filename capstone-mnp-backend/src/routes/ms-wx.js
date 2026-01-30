@@ -20,13 +20,13 @@ router.post('/weather', validateVCAPIKey, requestId, validateWeatherVars, async 
 
   const { zip, dateString } = req.weatherParams
 
-  req.log.info({ req_id: req_id, route: "/weather", file: "wx-ms.js", req_weatherParams: req.weatherParams, step: "wx-ms: req.weatherParams" }, "parameters")
+  req.log.info({ req_id: req_id, route: "/weather", file: "ms-wx.js", req_weatherParams: req.weatherParams, step: "ms-wx: req.weatherParams" }, "parameters")
 
   const apiKey = config.vc_weather_key
   const baseUrl = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${zip}/${dateString}`;
   const fetchUrl = `${baseUrl}?unitGroup=us&include=current&contentType=json&key=${apiKey}`;
 
-  req.log.info({ req_id: req_id, route: "/weather", file: "wx-ms.js", baseUrl: baseUrl, step: "wx-ms: baseUrl" }, "WX URL")
+  req.log.info({ req_id: req_id, route: "/weather", file: "ms-wx.js", baseUrl: baseUrl, step: "ms-wx: baseUrl" }, "WX URL")
 
   const result = await fetch(fetchUrl)
   const rawBody = await result.text();
@@ -65,7 +65,7 @@ router.post('/weather', validateVCAPIKey, requestId, validateWeatherVars, async 
     description: dayData?.description || source.conditions,
     // raw: data,
   }
-  req.log.info({ req_id: req_id, route: "/weather", file: "wx-ms.js", sendData: sendData, step: "wx-ms: sendData" }, "sendData")
+  req.log.info({ req_id: req_id, route: "/weather", file: "ms-wx.js", sendData: sendData, step: "ms-wx: sendData" }, "sendData")
 
   res.json(sendData)
 })

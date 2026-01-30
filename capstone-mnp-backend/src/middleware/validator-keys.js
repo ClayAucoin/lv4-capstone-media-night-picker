@@ -5,7 +5,7 @@ import { config } from "../config.js"
 
 export function validateAPIKey(req, _res, next) {
   // tak = This App Key
-  const t_a_k = config.api_key
+  const t_a_k = config.core_api_key
   const takQuery = req.query?.key
   const takHeaders = req.headers['x-api-key']
 
