@@ -18,6 +18,20 @@
 | Loki                      |               |    3110    |    3110     | [192.168.1.129:3110](http://192.168.1.129:3110)          |
 | Grafana                   |               |    3001    |    3001     | [192.168.1.129:3001](http://192.168.1.129:3001)          |
 
+### Grafana
+
+```httpnnnnn
+http://192.168.1.129:3001/explore
+```
+
+```js
+{service=~".+"} |= "2e28b5e3-2caf-42eb-bb83-44a00bf8dc4a"
+
+{service=~".+"} |= "bk-core getWxCondition success"
+
+{service=~".+"} | json | level=30 or level=50
+```
+
 ### INSERT new set
 
 <!--
