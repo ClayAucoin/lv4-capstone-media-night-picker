@@ -7,6 +7,8 @@ import { validateWeatherVars } from "../middleware/validator-wx.js"
 import { parseBoolean, normalizeCondition, buildQuerySignature } from '../utils/helpers.js'
 import { requestId } from "../middleware/requestId.js"
 import { config } from "../config.js"
+import { summarize } from "../utils/summarize.js"
+import { sanitize } from "../utils/sanitize.js"
 import supabase from "../utils/supabase.js"
 
 const router = express.Router()
@@ -16,49 +18,33 @@ const RECOMMENDATIONS_TABLE = "lv4_cap_recommendations"
 let REQ_ID, QUERY_SIG, WX_READ_URL, AI_READ_URL, AI_ADD_URL
 
 router.post("/core", validateAPIKey, requestId, async (req, res, next) => {
-  console.log("HERE")
   const apiHeader = config.core_api_key
   REQ_ID = req.req_id
+  const log = req.log.child({ req_id: REQ_ID, route: req.originalUrl, method: req.method, file: "core.js" })
+  const log_full_payloads = parseBoolean(config.log_full_payloads)
 
   const isTesting = parseBoolean(req.query.t)
   const useLocal = parseBoolean(req.query.l)
   const { pv, zip, date, len_bkt, moods } = req.body
 
-  req.log.info({ req_id: REQ_ID, route: "/core", file: "core.js", req_body: req.body, step: "bk-core: req.body" }, "parameters")
+  req.log.info({ event: "req.body", step: "req.body received from frontend", ctx: { name: "req_body", payload: req.body } }, "req body received")
 
   const wxPayload = { zip: zip, date: date }
   const aiBase = { len_bkt: len_bkt, moods: moods }
 
   // get wx condition
-  req.log.info({ req_id: REQ_ID, route: "/core", file: "core.js", wxPayload: wxPayload, step: "b4 getWxCondition success response" }, "wxPayload")
-
-  console.log("req_id::", req.req_id)
-  console.log("route::", req.originalUrl)
-  console.log("method::", req.method)
-
-  let wx_condition
+  let wx_condition, condition_output
   try {
     const data = await getWxCondition(wxPayload, isTesting, useLocal)
     wx_condition = data.conditions
-    req.log.info({ req_id: REQ_ID, route: "/core", file: "core.js", wx_condition: data, step: "getWxCondition success response" }, "function response")
-    req.log.info({ req_id: REQ_ID, route: "/core", file: "core.js", WX_READ_URL: WX_READ_URL, step: "bk-core: WX_READ_URL" }, "URL")
-    req.log.info(
-      {
-        req_id: req.req_id,
-        route: req.originalUrl,
-        method: req.method,
-        file: "core.js",
-        event: "wx.read.url",
-        step: "bk-core: WX_READ_URL",
-        ctx: {
-          url: WX_READ_URL,
-        },
-      },
-      "AI read URL set"
-    )
-
+    if (log_full_payloads) {
+      req.log.debug({ event: "wx.condition.success", step: "getWxCondition", ctx: { name: "wx_condition", payload: data } }, "wx condition received (raw)")
+    } else {
+      req.log.info({ event: "wx.condition.success", step: "getWxCondition", ctx: { name: "wx_condition", payload: wx_condition } }, "wx condition received")
+    }
+    req.log.info({ event: "wx.read.url", step: "WX_READ_URL", ctx: { name: "WX_READ_URL", payload: WX_READ_URL }, }, "AI read URL set")
   } catch (err) {
-    req.log.error({ req_id: REQ_ID, route: "/core", file: "core.js", step: "bk-core: getWxCondition fail", err }, "error")
+    req.log.error({ event: "wx.condition.error", step: "getWxCondition error", err }, "wx conditions failed")
     return next(sendError(500, "Failed to fetch data (getWxCondition)", "FETCH_ERROR", { underlying: err.message }))
   }
 
@@ -71,7 +57,7 @@ router.post("/core", validateAPIKey, requestId, async (req, res, next) => {
   })
 
   // query_signature check
-  req.log.info({ req_id: REQ_ID, route: "/core", file: "core.js", query_string: QUERY_SIG, step: "bk-core: query_signature, before query_signature_ck" }, "query_signature")
+  req.log.info({ event: "query.signature", step: "before query_signature_ck", ctx: { name: "QUERY_SIG", payload: QUERY_SIG } }, "query signature built")
 
   const { data: ck_qs, error: ck_err } = await supabase
     .from(SETS_TABLE)
@@ -79,22 +65,29 @@ router.post("/core", validateAPIKey, requestId, async (req, res, next) => {
     .eq("query_signature", QUERY_SIG)
     .limit(1)
 
-  req.log.info({ req_id: REQ_ID, route: "/core", file: "core.js", ck_qs: ck_qs, step: "bk-core: ck_qs, query_signature_ck response" }, "query_signature_ck")
+  req.log.info({ event: "", step: "ck_qs, query_signature_ck response", ctx: { name: "ck_qs", payload: ck_qs } }, "query signature check")
 
-  if (ck_err) { return next(sendError(500, "Failed to read data", "READ_ERROR", { underlying: ck_err.message })) }
+  if (ck_err) {
+    req.log.error({ event: "query.signature.check.error", step: "query signature check error", ck_err }, "query signature check failed")
+    return next(sendError(500, "Failed to read data", "READ_ERROR", { underlying: ck_err.message }))
+  }
 
   let sendData, aiPayload, aiResponse, addPayload, data_out, message
   if (ck_qs.length === 0) {
     // get ai response
     aiPayload = { wx_bkt: wx_condition, ...aiBase }
-    req.log.info({ req_id: REQ_ID, route: "/core", file: "core.js", aiPayload: aiPayload, step: "bk-core: aiPayload" }, "aiPayload")
+    req.log.info({ aiPayload: aiPayload, step: "aiPayload" }, "aiPayload")
 
     try {
       aiResponse = await getAiSuggestions(aiPayload, isTesting, useLocal)
-      req.log.info({ req_id: REQ_ID, route: "/core", file: "core.js", data_ai: aiResponse, step: "bk-core: getAiSuggestions success" }, "function response")
-      req.log.info({ req_id: REQ_ID, route: "/core", file: "core.js", AI_READ_URL: AI_READ_URL, step: "bk-core: AI_READ_URL" }, "URL")
+      if (log_full_payloads) {
+        req.log.debug({ event: "ai.response.success", step: "getAiSuggestions", ctx: { name: "aiResponse", payload: aiResponse } }, "ai response received (raw)")
+      } else {
+        req.log.info({ event: "ai.response.success", step: "getAiSuggestions", ctx: { name: "aiResponse", payload: summarize(aiResponse) } }, "ai response received")
+      }
+      req.log.info({ event: "wx.read.url", step: "WX_READ_URL", ctx: { name: "WX_READ_URL", payload: WX_READ_URL } }, "AI read URL set")
     } catch (err) {
-      req.log.error({ req_id: REQ_ID, route: "/core", file: "core.js", err_caught: err, step: "bk-core: getAiSuggestions error" }, "error")
+      req.log.error({ event: "ai.response.error", step: "getAiSuggestions error", err }, "ai response failed")
       return next(sendError(500, "Failed to fetch data (getAiSuggestions)", "FETCH_ERROR", { underlying: err.message }))
     }
     // console.log("aiResponse:", aiResponse)
@@ -116,7 +109,8 @@ router.post("/core", validateAPIKey, requestId, async (req, res, next) => {
         "recommendations": aiResponse.data.recommendations
       }
     }
-    req.log.info({ req_id: REQ_ID, route: "/core", file: "core.js", addPayload: addPayload, step: "bk-core: addPayload, before addAiSuggestions" }, "addPayload")
+    req.log.info({ addPayload: addPayload, step: "addPayload, before addAiSuggestions" }, "addPayload")
+    req.log.info({ event: "add.payload", step: "getAiSuggestions", ctx: { name: "aiResponse", payload: summarize(aiResponse) } }, "ai response received")
 
     sendData = await addAiSuggestions(addPayload, isTesting, useLocal)
 
@@ -128,7 +122,10 @@ router.post("/core", validateAPIKey, requestId, async (req, res, next) => {
       .select()
       .eq("set_id", ck_qs[0].id)
 
-    if (recs_err) return next(sendError(500, "Failed to read recommendations", "READ_ERROR", { underlying: recs_err.message }))
+    if (recs_err) {
+      req.log.error({ event: "read.recommendations.error", step: "read recommendations error", recs_err }, "read recommendations failed")
+      return next(sendError(500, "Failed to read recommendations", "READ_ERROR", { underlying: recs_err.message }))
+    }
 
     message = "Movies retrieved successfully."
 
@@ -139,9 +136,9 @@ router.post("/core", validateAPIKey, requestId, async (req, res, next) => {
       data: { recommendations: recs_data }
     }
   }
-  req.log.info({ req_id: REQ_ID, route: "/core", file: "core.js", AI_ADD_URL: AI_ADD_URL, step: "bk-core: AI_ADD_URL" }, "URL")
+  req.log.info({ event: "", AI_ADD_URL: AI_ADD_URL, step: "AI_ADD_URL" }, "URL")
 
-  req.log.info({ req_id: REQ_ID, route: "/core", file: "core.js", data_existing: sendData, message: message, step: "bk-core: sendData" }, "sendData")
+  req.log.info({ event: "send.data", step: "sendData", ctx: { name: "sendData", payload: summarize(sendData), message: message } }, "send ai response")
   console.log(`POST /core testing: ${isTesting}, local: ${useLocal}`)
   res.status(200).json(sendData)
 })

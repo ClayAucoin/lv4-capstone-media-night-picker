@@ -4,6 +4,8 @@
 - send api-key to backend
 - CHECK APPS
   - Backend
+- why is this url showing in every submition?
+  - https://api.themoviedb.org/3/movie/560824/images?include_image_language=en,null
 
 ### Stacks
 

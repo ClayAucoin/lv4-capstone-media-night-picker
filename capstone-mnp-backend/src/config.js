@@ -15,7 +15,7 @@ export const config = {
   supabaseKey: process.env.SUPABASE_ANON_KEY || "",
   loki_host: process.env.LOKI_HOST,
   vc_weather_key: process.env.VC_WEATHER_KEY || "",
-  log_full_payloads: process.env.LOG_FULL_PAYLOADS || false,
+  log_full_payloads: process.env.LOG_FULL_PAYLOADS || "false",
 
   dbUrl: process.env.DB_URL || ""
 }

@@ -29,9 +29,6 @@ export function AuthProvider({ children }) {
     () => l === true || (l === null && isLocalhost),
   )
 
-  console.log("isLocalhost:", isLocalhost)
-  console.log("auth: t:", isTesting, "l:", useLocal)
-
   if (isLoading) return <p>Loading...</p>
 
   const value = {

@@ -54,20 +54,6 @@ export default function FormFields() {
   // loading state for spinner + disabling
   const [isLoading, setIsLoading] = useState(false)
 
-  // // check if localhost or remote
-  // const isLocalhost = ["localhost", "127.0.0.1"].includes(
-  //   window.location.hostname,
-  // )
-  // const [isTesting, setIsTesting] = useState(isLocalhost)
-  // const [useLocal, setUseLocal] = useState(isLocalhost)
-
-  // useEffect(() => {
-  //   setIsTesting(true)
-  //   setUseLocal(true)
-  // }, [])
-
-  console.log("form:t:", isTesting, "l:", useLocal)
-
   // get sets from table
   const getSets = useCallback(async () => {
     const { data, error } = await supabase.from(SET_TABLE).select()
