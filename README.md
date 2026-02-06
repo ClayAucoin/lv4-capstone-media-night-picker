@@ -29,11 +29,11 @@ The project combines a React frontend, an Express API backend, two supporting mi
 <div style="text-align:center">
   <h2>Search Form</h2>
 
-![Search Form](images/form.png){ style="display: block; margin: 0 auto" }
+![Search Form](images/form.png)
 
   <h2>Recommendation Results</h2>
 
-![Search Results](images/results.png){ style="display: block; margin: 0 auto" }
+![Search Results](images/results.png)
 
 </div>
 
