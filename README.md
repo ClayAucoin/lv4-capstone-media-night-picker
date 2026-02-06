@@ -47,7 +47,7 @@ At its current stage, the Media Night Picker can:
 
 ## Screenshots
 
-<p align="center"><h2>Search Form</h2></p>
+<h2 align="center">Search Form</h2>
 
 <p align="center">
   <img src="images/form.png" alt="Search Form">
