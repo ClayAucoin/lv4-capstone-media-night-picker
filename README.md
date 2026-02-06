@@ -26,22 +26,16 @@ The project combines a React frontend, an Express API backend, two supporting mi
 
 ## Screenshots
 
-### Search Form
+<div style="text-align:center">
+  <h2>Search Form</h2>
 
-![Search Form](images/form.png)
+![Search Form](images/form.png){ style="display: block; margin: 0 auto" }
 
-### Recommendation Results
+  <h2>Recommendation Results</h2>
 
-![Results](images/results.png)
+![Search Results](images/results.png){ style="display: block; margin: 0 auto" }
 
-Recommended screenshots to include:
-
-- The initial form view showing ZIP, date, moods, and length selection
-- A populated results page displaying movie recommendations
-- An example of the reasoning text returned for a recommendation
-- Optional: a database view showing stored recommendation sets
-
-Screenshots can be added later without modifying the surrounding documentation.
+</div>
 
 ## Problem Statement
 
