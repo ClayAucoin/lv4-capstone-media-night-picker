@@ -3,9 +3,9 @@
 ## Table of Contents
 
 - [Overview](#overview)
-- [Screenshots](#screenshots)
 - [Problem Statement](#problem-statement)
 - [What It Does](#what-it-does)
+- [Screenshots](#screenshots)
 - [Project Structure](#project-structure)
 - [Architecture Overview](#architecture-overview)
 - [Request Flow](#request-flow)
@@ -23,20 +23,6 @@
 **This app is for people who want to quickly decide what movie to watch based on mood, available time, and the weather.**
 
 The project combines a React frontend, an Express API backend, two supporting microservices (AI and Weather), and a Supabase PostgreSQL database. It is designed to demonstrate real‑world data flow, API composition, and structured decision logic rather than being a polished consumer product.
-
-## Screenshots
-
-<h2>Search Form</h2>
-
-<p align="center">
-  <img src="images/form.png" alt="Search Form">
-</p>
-
-<h2>Recommendation Results</h2>
-
-<p align="center">
-  <img src="images/results.png" alt="Search Form">
-</p>
 
 ## Problem Statement
 
@@ -58,6 +44,18 @@ At its current stage, the Media Night Picker can:
 - Normalize and store recommendation sets in Supabase
 - Detect duplicate recommendation requests using a query signature
 - Display results with posters and reasoning
+
+## Screenshots
+
+<p align="center">
+<h2>Search Form</h2>
+  <img src="images/form.png" alt="Search Form">
+</p>
+
+<p align="center">
+<h2>Recommendation Results</h2>
+  <img src="images/results.png" alt="Search Form">
+</p>
 
 ## Project Structure
 
