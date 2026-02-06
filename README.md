@@ -53,8 +53,9 @@ At its current stage, the Media Night Picker can:
   <img src="images/form.png" alt="Search Form">
 </p>
 
+<h2 align="center">Recommendation Results</h2>
+
 <p align="center">
-<h2>Recommendation Results</h2>
   <img src="images/results.png" alt="Search Form">
 </p>
 
