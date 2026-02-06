@@ -29,13 +29,13 @@ The project combines a React frontend, an Express API backend, two supporting mi
 <h2>Search Form</h2>
 
 <p align="center">
-  <img src="images/form.png" width="600" alt="Search Form">
+  <img src="images/form.png" alt="Search Form">
 </p>
 
 <h2>Recommendation Results</h2>
 
 <p align="center">
-  <img src="images/results.png" width="600" alt="Search Form">
+  <img src="images/results.png" alt="Search Form">
 </p>
 
 ## Problem Statement
