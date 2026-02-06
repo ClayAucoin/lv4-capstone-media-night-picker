@@ -1,11 +1,38 @@
 ## Todo
 
+- add a random picker for the weather, mood and length
+
 - validate input
 - send api-key to backend
 - CHECK APPS
   - Backend
-- why is this url showing in every submition?
+- why is this url showing in the browser console for every submition?
   - https://api.themoviedb.org/3/movie/560824/images?include_image_language=en,null
+- land errors softly for users
+
+- Design decisions to fix
+  - Services are split by responsibility (frontend, API, weather, AI) to mirror real-world architectures
+  - Query signatures are generated deterministically to prevent duplicate recommendation sets
+  - Error handling favors explicit logging over silent failure
+  - Minimal authentication was chosen to keep focus on data flow and validation
+  - UI prioritizes clarity and debuggability over visual polish
+
+- Items to check for "troubleshooting"
+  - **Empty results page**
+    - Usually means the Display route was loaded directly without submitting the form
+  - **Weather lookup fails**
+    - Verify ZIP code format and weather API key
+  - **AI service returns malformed JSON**
+    - The AI service includes defensive parsing, but malformed responses may still throw errors
+  - **Duplicate recommendation sets**
+    - Check the generated `query_signature` in Supabase to confirm normalization behavior
+
+- Known Limitations
+  - This project is optimized for learning and demonstration, not production scale
+  - Authentication and authorization are not hardened
+  - API rate limiting is not enforced
+  - AI output quality depends on prompt tuning and model behavior
+  - No background job or caching layer exists for expensive operations
 
 ### Stacks
 

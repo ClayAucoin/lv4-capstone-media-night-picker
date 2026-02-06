@@ -3,6 +3,7 @@
 ## Table of Contents
 
 - [Overview](#overview)
+- [Screenshots](#screenshots)
 - [Problem Statement](#problem-statement)
 - [What It Does](#what-it-does)
 - [Project Structure](#project-structure)
@@ -12,8 +13,6 @@
 - [Setup and Run Instructions](#setup-and-run-instructions)
 - [Configuration](#configuration)
 - [Example Usage](#example-usage)
-- [Testing](#testing)
-- [Troubleshooting](#troubleshooting)
 - [Design Decisions](#design-decisions)
 - [Known Limitations](#known-limitations)
 
@@ -24,6 +23,25 @@
 **This app is for people who want to quickly decide what movie to watch based on mood, available time, and the weather.**
 
 The project combines a React frontend, an Express API backend, two supporting microservices (AI and Weather), and a Supabase PostgreSQL database. It is designed to demonstrate real‑world data flow, API composition, and structured decision logic rather than being a polished consumer product.
+
+## Screenshots
+
+### Search Form
+
+![Search Form](images/form.png)
+
+### Recommendation Results
+
+![Results](images/results.png)
+
+Recommended screenshots to include:
+
+- The initial form view showing ZIP, date, moods, and length selection
+- A populated results page displaying movie recommendations
+- An example of the reasoning text returned for a recommendation
+- Optional: a database view showing stored recommendation sets
+
+Screenshots can be added later without modifying the surrounding documentation.
 
 ## Problem Statement
 
@@ -171,7 +189,7 @@ The project uses environment variables for configuration.
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `HF_TOKEN`
-- Weather API key
+- Weather API key for Visual Crossing
 
 If a variable is missing, the related service will fail at runtime rather than silently degrading.
 
@@ -241,41 +259,6 @@ Stored fields include:
 
 This separation allows a single request to own many recommendations while keeping query metadata isolated.
 
-## Testing
-
-- Backend uses **Vitest** and **Supertest**
-- Tests focus on helpers, normalization logic, and route behavior
-
-Run backend tests:
-
-```
-npm test
-```
-
-Coverage reports are available using:
-
-```
-npm run test:coverage
-```
-
-## Troubleshooting
-
-**Empty results page**
-
-- Usually means the Display route was loaded directly without submitting the form
-
-**Weather lookup fails**
-
-- Verify ZIP code format and weather API key
-
-**AI service returns malformed JSON**
-
-- The AI service includes defensive parsing, but malformed responses may still throw errors
-
-**Duplicate recommendation sets**
-
-- Check the generated `query_signature` in Supabase to confirm normalization behavior
-
 ## Design Decisions
 
 - Services are split by responsibility (frontend, API, weather, AI) to mirror real-world architectures
@@ -295,3 +278,5 @@ npm run test:coverage
 ---
 
 **Project:** LV4 Capstone Media Night Picker
+
+**Author:** Clay Aucoin
